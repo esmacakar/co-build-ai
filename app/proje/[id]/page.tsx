@@ -16,6 +16,31 @@ type OfferRow = {
   developer_id: string;
 };
 
+async function fetchRatingSummary(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  ratedUserId: string
+) {
+  const { data } = await supabase.from("ratings").select("score").eq("rated_user_id", ratedUserId);
+  const scores = data ?? [];
+  const count = scores.length;
+  const avg = count > 0 ? scores.reduce((sum, r) => sum + r.score, 0) / count : null;
+  return { avg, count };
+}
+
+async function hasRated(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  offerId: string,
+  raterId: string
+) {
+  const { data } = await supabase
+    .from("ratings")
+    .select("id")
+    .eq("offer_id", offerId)
+    .eq("rater_id", raterId)
+    .maybeSingle();
+  return !!data;
+}
+
 export default async function ProjeDetay({
   params,
 }: {
@@ -43,11 +68,30 @@ export default async function ProjeDetay({
   }
 
   const isFounder = project.founder_id === user.id;
-  let developerView: { alreadyAccepted: boolean; offer: OfferRow | null; founderName: string | null } | null =
-    null;
+  let developerView:
+    | {
+        alreadyAccepted: boolean;
+        offer: (OfferRow & { alreadyRatedByMe: boolean }) | null;
+        founderName: string | null;
+        founderRatingAvg: number | null;
+        founderRatingCount: number;
+      }
+    | null = null;
   let offers: (OfferRow & {
-    developer: { full_name: string | null; bio: string | null; skills: string[] | null } | null;
+    developer: {
+      full_name: string | null;
+      bio: string | null;
+      skills: string[] | null;
+      availability: string | null;
+    } | null;
+    developerRatingAvg: number | null;
+    developerRatingCount: number;
+    alreadyRatedByMe: boolean;
   })[] = [];
+  let founderDefaults: { paymentType: "fixed" | "equity" | "flexible" | null; paymentAmount: number | null } = {
+    paymentType: null,
+    paymentAmount: null,
+  };
 
   if (!isFounder) {
     // Sadece yayınlanmış projeler başka kullanıcılara açık
@@ -86,12 +130,31 @@ export default async function ProjeDetay({
       .eq("id", project.founder_id)
       .maybeSingle();
 
+    const founderRating = await fetchRatingSummary(supabase, project.founder_id);
+    const alreadyRatedByMe =
+      myOffer && myOffer.status === "accepted" ? await hasRated(supabase, myOffer.id, user.id) : false;
+
     developerView = {
       alreadyAccepted: !!ndaAcceptance,
-      offer: myOffer ?? null,
+      offer: myOffer ? { ...myOffer, alreadyRatedByMe } : null,
       founderName: founderProfile?.full_name ?? null,
+      founderRatingAvg: founderRating.avg,
+      founderRatingCount: founderRating.count,
     };
-  } else if (project.status === "published") {
+  } else if (project.status === "draft") {
+    const { data: founderProfile } = await supabase
+      .from("profiles")
+      .select("default_payment_type, default_payment_amount")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    founderDefaults = {
+      paymentType: founderProfile?.default_payment_type ?? null,
+      paymentAmount: founderProfile?.default_payment_amount ?? null,
+    };
+  }
+
+  if (isFounder && project.status === "published") {
     const { data: offersData } = await supabase
       .from("offers")
       .select("*")
@@ -102,13 +165,22 @@ export default async function ProjeDetay({
       const developerIds = offersData.map((o) => o.developer_id);
       const { data: devProfiles } = await supabase
         .from("profiles")
-        .select("id, full_name, bio, skills")
+        .select("id, full_name, bio, skills, availability")
         .in("id", developerIds);
 
-      offers = offersData.map((o) => ({
-        ...o,
-        developer: devProfiles?.find((p) => p.id === o.developer_id) ?? null,
-      }));
+      offers = await Promise.all(
+        offersData.map(async (o) => {
+          const rating = await fetchRatingSummary(supabase, o.developer_id);
+          const alreadyRatedByMe = o.status === "accepted" ? await hasRated(supabase, o.id, user.id) : false;
+          return {
+            ...o,
+            developer: devProfiles?.find((p) => p.id === o.developer_id) ?? null,
+            developerRatingAvg: rating.avg,
+            developerRatingCount: rating.count,
+            alreadyRatedByMe,
+          };
+        })
+      );
     }
   }
 
@@ -140,6 +212,8 @@ export default async function ProjeDetay({
             userId={user.id}
             founderId={project.founder_id}
             founderName={developerView.founderName}
+            founderRatingAvg={developerView.founderRatingAvg}
+            founderRatingCount={developerView.founderRatingCount}
             requiredSkills={project.required_skills}
             prd={project.generated_prd}
             alreadyAccepted={developerView.alreadyAccepted}
@@ -174,7 +248,11 @@ export default async function ProjeDetay({
                       PRD&apos;yi inceledin mi? Her şey doğru görünüyorsa, ödeme
                       tipini seçip projeni yazılımcılara açabilirsin.
                     </p>
-                    <PublishForm projectId={project.id} />
+                    <PublishForm
+                      projectId={project.id}
+                      defaultPaymentType={founderDefaults.paymentType}
+                      defaultPaymentAmount={founderDefaults.paymentAmount}
+                    />
                   </div>
                 )}
 

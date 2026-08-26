@@ -61,12 +61,22 @@ function PaymentForm({
   );
 }
 
-export function PublishForm({ projectId }: { projectId: string }) {
+export function PublishForm({
+  projectId,
+  defaultPaymentType,
+  defaultPaymentAmount,
+}: {
+  projectId: string;
+  defaultPaymentType?: PaymentType | null;
+  defaultPaymentAmount?: number | null;
+}) {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-  const [paymentType, setPaymentType] = useState<PaymentType>("fixed");
-  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentType, setPaymentType] = useState<PaymentType>(defaultPaymentType ?? "fixed");
+  const [paymentAmount, setPaymentAmount] = useState(
+    defaultPaymentAmount ? String(defaultPaymentAmount) : ""
+  );
 
   async function handlePublish() {
     setLoading(true);

@@ -1,0 +1,55 @@
+import Avatar from "./avatar";
+
+export default function TrendingWidget({
+  trendingProjects,
+  trendingDevelopers,
+}: {
+  trendingProjects: { id: string; title: string; offerCount: number }[];
+  trendingDevelopers: { id: string; full_name: string | null; acceptedCount: number }[];
+}) {
+  if (trendingProjects.length === 0 && trendingDevelopers.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      {trendingProjects.length > 0 && (
+        <div className="rounded-xl border border-ink/10 bg-white p-4">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
+            🔥 Öne Çıkan Projeler
+          </p>
+          <div className="mt-3 flex flex-col gap-3">
+            {trendingProjects.map((p, i) => (
+              <a
+                key={p.id}
+                href={`/proje/${p.id}`}
+                className="flex items-center gap-2 text-sm transition-colors hover:text-coral-dark"
+              >
+                <span className="font-display font-bold text-ink-soft">{i + 1}</span>
+                <span className="min-w-0 flex-1 truncate text-ink">{p.title}</span>
+                <span className="shrink-0 text-xs text-ink-soft">{p.offerCount} teklif</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {trendingDevelopers.length > 0 && (
+        <div className="rounded-xl border border-ink/10 bg-white p-4">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
+            ⭐ En Aktif Yazılımcılar
+          </p>
+          <div className="mt-3 flex flex-col gap-3">
+            {trendingDevelopers.map((d) => (
+              <div key={d.id} className="flex items-center gap-2">
+                <Avatar name={d.full_name} role="developer" size="sm" />
+                <span className="min-w-0 flex-1 truncate text-sm text-ink">{d.full_name ?? "İsimsiz"}</span>
+                <span className="shrink-0 text-xs text-ink-soft">{d.acceptedCount} kabul</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

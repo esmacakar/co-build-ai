@@ -2,7 +2,15 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import EditProfile from "./edit-profile";
 import PortfolioSection from "./portfolio-section";
+import FounderProjects from "./founder-projects";
 import Avatar from "@/app/components/avatar";
+import StatCircle from "@/app/components/stat-circle";
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Bekliyor",
+  accepted: "Kabul Edildi",
+  rejected: "Reddedildi",
+};
 
 export default async function Profil() {
   const supabase = await createClient();
@@ -22,16 +30,63 @@ export default async function Profil() {
     .single();
 
   let myProjects: any[] = [];
+  let recentOffers: any[] = [];
+  let totalOfferCount = 0;
+
   if (profile?.user_type === "founder") {
     const { data } = await supabase
       .from("projects")
       .select("*")
       .eq("founder_id", user.id)
       .order("created_at", { ascending: false });
-    myProjects = data ?? [];
+    const projectsRaw = data ?? [];
+    const projectIds = projectsRaw.map((p) => p.id);
+
+    const offersByProject: Record<string, { total: number; hasAccepted: boolean }> = {};
+
+    if (projectIds.length > 0) {
+      const { data: offersData } = await supabase
+        .from("offers")
+        .select("id, project_id, developer_id, status, created_at")
+        .in("project_id", projectIds)
+        .order("created_at", { ascending: false });
+
+      totalOfferCount = offersData?.length ?? 0;
+
+      for (const o of offersData ?? []) {
+        if (!offersByProject[o.project_id]) {
+          offersByProject[o.project_id] = { total: 0, hasAccepted: false };
+        }
+        offersByProject[o.project_id].total += 1;
+        if (o.status === "accepted") offersByProject[o.project_id].hasAccepted = true;
+      }
+
+      const recentRaw = (offersData ?? []).slice(0, 5);
+      const developerIds = [...new Set(recentRaw.map((o) => o.developer_id))];
+      const { data: devProfiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", developerIds);
+
+      recentOffers = recentRaw.map((o) => ({
+        ...o,
+        developerName: devProfiles?.find((d) => d.id === o.developer_id)?.full_name ?? null,
+        projectTitle: projectsRaw.find((p) => p.id === o.project_id)?.title ?? null,
+      }));
+    }
+
+    myProjects = projectsRaw.map((p) => {
+      const stats = offersByProject[p.id] ?? { total: 0, hasAccepted: false };
+      let progress = p.generated_prd ? 25 : 10;
+      if (p.status === "published") progress = 50;
+      if (stats.total > 0) progress = 75;
+      if (stats.hasAccepted) progress = 100;
+      return { ...p, offerCount: stats.total, progress };
+    });
   }
 
   let portfolioItems: any[] = [];
+  let myOffers: any[] = [];
   if (profile?.user_type === "developer") {
     const { data } = await supabase
       .from("portfolio_items")
@@ -39,6 +94,24 @@ export default async function Profil() {
       .eq("developer_id", user.id)
       .order("created_at", { ascending: false });
     portfolioItems = data ?? [];
+
+    const { data: offersData } = await supabase
+      .from("offers")
+      .select("id, project_id, status, created_at")
+      .eq("developer_id", user.id)
+      .order("created_at", { ascending: false });
+
+    const rawOffers = offersData ?? [];
+    const offerProjectIds = [...new Set(rawOffers.map((o) => o.project_id))];
+    const { data: offerProjects } =
+      offerProjectIds.length > 0
+        ? await supabase.from("projects").select("id, title").in("id", offerProjectIds)
+        : { data: [] };
+
+    myOffers = rawOffers.map((o) => ({
+      ...o,
+      projectTitle: offerProjects?.find((p) => p.id === o.project_id)?.title ?? null,
+    }));
   }
 
   return (
@@ -50,12 +123,31 @@ export default async function Profil() {
             role={profile?.user_type === "founder" ? "founder" : "developer"}
             size="lg"
           />
-          <h1 className="mt-4 font-display text-3xl font-semibold text-ink">
+          <h1 className="mt-4 font-display text-3xl font-bold text-ink sm:text-4xl">
             {profile?.full_name ?? "Profilim"}
           </h1>
           <p className="mt-2 text-sm text-ink-soft">
             {profile?.user_type === "founder" ? "Fikir Sahibi" : "Yazılımcı"}
           </p>
+
+          <div className="mt-6 flex items-center gap-4">
+            {profile?.user_type === "founder" ? (
+              <>
+                <StatCircle
+                  value={myProjects.filter((p) => p.status === "published").length}
+                  label="Yayında"
+                  tone="lime"
+                  size={110}
+                />
+                <StatCircle value={totalOfferCount} label="Toplam Teklif" tone="pink" size={110} />
+              </>
+            ) : (
+              <>
+                <StatCircle value={portfolioItems.length} label="Portfolyo Öğesi" tone="lime" size={110} />
+                <StatCircle value={myOffers.length} label="Gönderdiğim Teklif" tone="pink" size={110} />
+              </>
+            )}
+          </div>
 
           {profile?.user_type === "founder" && (
             <a href="/fikir-ekle" className="mt-6 inline-block rounded-full bg-coral px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-coral-dark">
@@ -65,57 +157,43 @@ export default async function Profil() {
         </div>
 
         {profile?.user_type === "founder" && (
-          <div className="mt-12">
-            <h2 className="font-display text-xl font-semibold text-ink">
-              Projelerim
-            </h2>
+          <>
+            <FounderProjects projects={myProjects} />
 
-            {myProjects.length === 0 ? (
-              <div className="mt-4 rounded-xl border border-dashed border-ink/15 bg-white/60 p-10 text-center">
-                <p className="text-2xl">💡</p>
-                <p className="mt-2 text-sm text-ink-soft">
-                  Henüz bir fikir eklemedin.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-6 flex flex-col gap-4">
-               
-{myProjects.map((project) => (
-  <a
-    key={project.id}
-    href={`/proje/${project.id}`}
-    className="flex items-center justify-between rounded-xl border border-ink/10 bg-white p-5 transition-colors hover:border-coral/40"
-  >
-    <div>
-      <h3 className="font-display text-lg font-semibold text-ink">
-        {project.title}
-      </h3>
-
-      {!project.generated_prd ? (
-        <span className="mt-1 inline-flex items-center gap-2 text-xs text-coral-dark">
-          <span className="h-2 w-2 animate-spin rounded-full border-2 border-coral border-t-transparent" />
-          PRD hazırlanıyor
-        </span>
-      ) : (
-        <span
-          className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-            project.status === "published"
-              ? "bg-periwinkle-dark text-white"
-              : "bg-petal text-coral-dark"
-          }`}
-        >
-          {project.status === "published" ? "Yayında" : "Taslak"}
-        </span>
-      )}
-    </div>
-
-    <span className="text-ink-soft">→</span>
-  </a>
-))}
-
+            {recentOffers.length > 0 && (
+              <div className="mt-10">
+                <h2 className="font-mono text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                  Son Teklifler
+                </h2>
+                <div className="mt-3 flex flex-col gap-2">
+                  {recentOffers.map((offer) => (
+                    <a
+                      key={offer.id}
+                      href={`/proje/${offer.project_id}`}
+                      className="flex items-center gap-3 rounded-lg border border-ink/10 bg-white p-3 transition-colors hover:border-coral/40"
+                    >
+                      <Avatar name={offer.developerName} role="developer" size="sm" />
+                      <p className="min-w-0 flex-1 truncate text-sm text-ink">
+                        <strong>{offer.developerName ?? "İsimsiz Yazılımcı"}</strong>
+                        <span className="text-ink-soft"> — {offer.projectTitle}</span>
+                      </p>
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          offer.status === "accepted"
+                            ? "bg-periwinkle-dark text-white"
+                            : offer.status === "rejected"
+                            ? "bg-coral/10 text-coral-dark"
+                            : "bg-petal text-coral-dark"
+                        }`}
+                      >
+                        {STATUS_LABELS[offer.status]}
+                      </span>
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
-          </div>
+          </>
         )}
 
         {profile?.user_type === "developer" && (
@@ -128,6 +206,38 @@ export default async function Profil() {
 
         {profile?.user_type === "developer" && (
           <PortfolioSection userId={user.id} items={portfolioItems} />
+        )}
+
+        {profile?.user_type === "developer" && myOffers.length > 0 && (
+          <div className="mt-10">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-wide text-ink-soft">
+              Son Tekliflerim
+            </h2>
+            <div className="mt-3 flex flex-col gap-2">
+              {myOffers.slice(0, 5).map((offer) => (
+                <a
+                  key={offer.id}
+                  href={`/proje/${offer.project_id}`}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-ink/10 bg-white p-3 transition-colors hover:border-coral/40"
+                >
+                  <p className="min-w-0 flex-1 truncate text-sm text-ink">
+                    {offer.projectTitle ?? "Bilinmeyen Proje"}
+                  </p>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      offer.status === "accepted"
+                        ? "bg-periwinkle-dark text-white"
+                        : offer.status === "rejected"
+                        ? "bg-coral/10 text-coral-dark"
+                        : "bg-petal text-coral-dark"
+                    }`}
+                  >
+                    {STATUS_LABELS[offer.status]}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

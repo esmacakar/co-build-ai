@@ -1,6 +1,18 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import Avatar from "@/app/components/avatar";
+import StatCircle from "@/app/components/stat-circle";
+import DeveloperProjects from "./developer-projects";
+import TrendingWidget from "@/app/components/trending-widget";
+import QuickMatch from "./quick-match";
+import FounderDevelopers from "./founder-developers";
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 6) return "İyi geceler";
+  if (hour < 12) return "Günaydın";
+  if (hour < 18) return "İyi günler";
+  return "İyi akşamlar";
+}
 
 export default async function Panel() {
   const supabase = await createClient();
@@ -36,10 +48,23 @@ export default async function Panel() {
         .select("id, full_name")
         .in("id", founderIds);
 
-      projects = data.map((p) => ({
-        ...p,
-        founderName: founderProfiles?.find((f) => f.id === p.founder_id)?.full_name ?? null,
-      }));
+      const mySkills = new Set((profile?.skills ?? []).map((s: string) => s.toLowerCase()));
+
+      projects = data.map((p) => {
+        const required: string[] = p.required_skills ?? [];
+        const matchScore =
+          required.length > 0 && mySkills.size > 0
+            ? Math.round(
+                (required.filter((s) => mySkills.has(s.toLowerCase())).length / required.length) * 100
+              )
+            : 0;
+
+        return {
+          ...p,
+          founderName: founderProfiles?.find((f) => f.id === p.founder_id)?.full_name ?? null,
+          matchScore,
+        };
+      });
     }
   } else if (profile?.user_type === "founder") {
     const { data } = await supabase
@@ -47,7 +72,33 @@ export default async function Panel() {
       .select("*")
       .eq("user_type", "developer")
       .order("created_at", { ascending: false });
-    developers = data ?? [];
+    const devsRaw = data ?? [];
+
+    if (devsRaw.length > 0) {
+      const { data: ratingsData } = await supabase
+        .from("ratings")
+        .select("rated_user_id, score")
+        .in(
+          "rated_user_id",
+          devsRaw.map((d) => d.id)
+        );
+
+      const ratingsByDev: Record<string, number[]> = {};
+      for (const r of ratingsData ?? []) {
+        (ratingsByDev[r.rated_user_id] ??= []).push(r.score);
+      }
+
+      developers = devsRaw.map((d) => {
+        const scores = ratingsByDev[d.id] ?? [];
+        return {
+          ...d,
+          ratingAvg: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null,
+          ratingCount: scores.length,
+        };
+      });
+    } else {
+      developers = [];
+    }
   }
 
   let processingProjects: any[] = [];
@@ -59,6 +110,58 @@ export default async function Panel() {
       .is("generated_prd", null)
       .order("created_at", { ascending: false });
     processingProjects = data ?? [];
+  }
+
+  // Trendler: platform genelinde öne çıkan projeler ve en aktif yazılımcılar
+  const { data: publishedForTrends } = await supabase
+    .from("projects")
+    .select("id, title")
+    .eq("status", "published");
+
+  const publishedIds = (publishedForTrends ?? []).map((p) => p.id);
+
+  let trendingProjects: { id: string; title: string; offerCount: number }[] = [];
+  let trendingDevelopers: { id: string; full_name: string | null; acceptedCount: number }[] = [];
+
+  if (publishedIds.length > 0) {
+    const { data: allOffers } = await supabase
+      .from("offers")
+      .select("project_id, developer_id, status")
+      .in("project_id", publishedIds);
+
+    const offerCountByProject: Record<string, number> = {};
+    const acceptedCountByDeveloper: Record<string, number> = {};
+
+    for (const o of allOffers ?? []) {
+      offerCountByProject[o.project_id] = (offerCountByProject[o.project_id] ?? 0) + 1;
+      if (o.status === "accepted") {
+        acceptedCountByDeveloper[o.developer_id] = (acceptedCountByDeveloper[o.developer_id] ?? 0) + 1;
+      }
+    }
+
+    trendingProjects = (publishedForTrends ?? [])
+      .map((p) => ({ ...p, offerCount: offerCountByProject[p.id] ?? 0 }))
+      .filter((p) => p.offerCount > 0)
+      .sort((a, b) => b.offerCount - a.offerCount)
+      .slice(0, 3);
+
+    const topDevIds = Object.entries(acceptedCountByDeveloper)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([id]) => id);
+
+    if (topDevIds.length > 0) {
+      const { data: topDevProfiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", topDevIds);
+
+      trendingDevelopers = topDevIds.map((id) => ({
+        id,
+        full_name: topDevProfiles?.find((d) => d.id === id)?.full_name ?? null,
+        acceptedCount: acceptedCountByDeveloper[id],
+      }));
+    }
   }
 
   return (
@@ -76,93 +179,41 @@ export default async function Panel() {
         </div>
       )}
 
-      <div className="mx-auto max-w-3xl">
-        <h1 className="font-display text-2xl font-semibold text-ink">
-          {profile?.user_type === "founder" ? "Yazılımcıları Keşfet" : "Yayınlanmış Projeler"}
-        </h1>
-
-        {profile?.user_type === "developer" && (
-          <div className="mt-6">
-            {projects.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-ink/15 bg-white/60 p-10 text-center">
-                <p className="text-2xl">🔭</p>
-                <p className="mt-2 text-sm text-ink-soft">
-                  Şu an yayınlanmış bir proje yok. Daha sonra tekrar kontrol et!
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {projects.map((project) => (
-                  <a
-                    key={project.id}
-                    href={`/proje/${project.id}`}
-                    className="block rounded-xl border border-ink/10 bg-white p-5 transition-colors hover:border-coral/40"
-                  >
-                    <h3 className="font-display text-lg font-semibold text-ink">
-                      {project.title}
-                    </h3>
-                    <div className="mt-1 flex items-center gap-2">
-                      <Avatar name={project.founderName} role="founder" size="sm" />
-                      <span className="text-xs text-ink-soft">
-                        {project.founderName ?? "İsimsiz Fikir Sahibi"}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-ink-soft line-clamp-3">
-                      {project.raw_idea}
-                    </p>
-                    {project.required_skills && project.required_skills.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {project.required_skills.map((skill: string) => (
-                          <span key={skill} className="rounded-full bg-petal px-3 py-1 font-mono text-xs text-coral-dark">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </a>
-                ))}
-              </div>
-            )}
+      <div className="mx-auto flex max-w-6xl items-start gap-8">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+              {getGreeting()}
+              {profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}!
+            </h1>
+            <p className="mt-2 text-sm text-ink-soft">
+              {profile?.user_type === "founder"
+                ? "Projene uygun yazılımcıları keşfet."
+                : "Sana uygun yayınlanmış projeleri keşfet."}
+            </p>
           </div>
-        )}
+
+          {profile?.user_type === "developer" ? (
+            <StatCircle value={projects.length} label="Yayınlanmış Proje" tone="pink" />
+          ) : (
+            <StatCircle value={developers.length} label="Kayıtlı Yazılımcı" tone="lime" />
+          )}
+        </div>
+
+        {profile?.user_type === "developer" && <DeveloperProjects projects={projects} />}
 
         {profile?.user_type === "founder" && (
-          <div className="mt-6">
-            {developers.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-ink/15 bg-white/60 p-10 text-center">
-                <p className="text-2xl">🧑‍💻</p>
-                <p className="mt-2 text-sm text-ink-soft">
-                  Henüz kayıtlı bir yazılımcı yok.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {developers.map((dev) => (
-                  <div key={dev.id} className="rounded-xl border border-ink/10 bg-white p-5">
-                    <div className="flex items-center gap-3">
-                      <Avatar name={dev.full_name} role="developer" />
-                      <h3 className="font-display text-lg font-semibold text-ink">
-                        {dev.full_name ?? "İsimsiz Yazılımcı"}
-                      </h3>
-                    </div>
-                    {dev.bio && (
-                      <p className="mt-2 text-sm text-ink-soft">{dev.bio}</p>
-                    )}
-                    {dev.skills && dev.skills.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {dev.skills.map((skill: string) => (
-                          <span key={skill} className="rounded-full bg-periwinkle/20 px-3 py-1 font-mono text-xs text-ink">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="mt-8">
+            <QuickMatch userId={user.id} developers={developers} />
+            <FounderDevelopers developers={developers} />
           </div>
         )}
+      </div>
+
+      <div className="hidden w-72 shrink-0 lg:block">
+        <TrendingWidget trendingProjects={trendingProjects} trendingDevelopers={trendingDevelopers} />
+      </div>
       </div>
     </div>
   );

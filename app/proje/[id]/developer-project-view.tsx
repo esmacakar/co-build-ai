@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import ChatBox from "@/app/components/chat-box";
 import Avatar from "@/app/components/avatar";
+import RatingStars from "@/app/components/rating-stars";
+import RateOfferForm from "@/app/components/rate-offer-form";
 
 type PaymentType = "fixed" | "equity";
 type ProjectPaymentType = PaymentType | "flexible";
@@ -15,6 +17,7 @@ type Offer = {
   proof_link: string | null;
   payment_type: PaymentType | null;
   status: "pending" | "accepted" | "rejected";
+  alreadyRatedByMe: boolean;
 };
 
 export default function DeveloperProjectView({
@@ -22,6 +25,8 @@ export default function DeveloperProjectView({
   userId,
   founderId,
   founderName,
+  founderRatingAvg,
+  founderRatingCount,
   requiredSkills,
   prd,
   alreadyAccepted,
@@ -33,6 +38,8 @@ export default function DeveloperProjectView({
   userId: string;
   founderId: string;
   founderName: string | null;
+  founderRatingAvg: number | null;
+  founderRatingCount: number;
   requiredSkills: string[] | null;
   prd: string;
   alreadyAccepted: boolean;
@@ -94,10 +101,13 @@ export default function DeveloperProjectView({
     <>
       <div className="mt-4 flex items-center gap-2">
         <Avatar name={founderName} role="founder" size="sm" />
-        <p className="text-sm text-ink-soft">
-          <span className="font-semibold text-ink">Fikir Sahibi:</span>{" "}
-          {founderName ?? "İsimsiz"}
-        </p>
+        <div>
+          <p className="text-sm text-ink-soft">
+            <span className="font-semibold text-ink">Fikir Sahibi:</span>{" "}
+            {founderName ?? "İsimsiz"}
+          </p>
+          <RatingStars average={founderRatingAvg} count={founderRatingCount} />
+        </div>
       </div>
 
       {requiredSkills && requiredSkills.length > 0 && (
@@ -246,6 +256,16 @@ function OfferSection({
           >
             Kanıt linki →
           </a>
+        )}
+
+        {offer.status === "accepted" && (
+          <RateOfferForm
+            offerId={offer.id}
+            raterId={userId}
+            ratedUserId={founderId}
+            ratedUserLabel={founderName ?? "Fikir Sahibi"}
+            alreadyRated={offer.alreadyRatedByMe}
+          />
         )}
 
         <ChatBox

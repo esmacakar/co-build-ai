@@ -4,6 +4,9 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import ChatBox from "@/app/components/chat-box";
 import Avatar from "@/app/components/avatar";
+import RatingStars from "@/app/components/rating-stars";
+import RateOfferForm from "@/app/components/rate-offer-form";
+import AvailabilityBadge from "@/app/components/availability-badge";
 
 type Offer = {
   id: string;
@@ -13,7 +16,15 @@ type Offer = {
   proof_link: string | null;
   payment_type: "fixed" | "equity" | null;
   status: "pending" | "accepted" | "rejected";
-  developer: { full_name: string | null; bio: string | null; skills: string[] | null } | null;
+  developer: {
+    full_name: string | null;
+    bio: string | null;
+    skills: string[] | null;
+    availability: string | null;
+  } | null;
+  developerRatingAvg: number | null;
+  developerRatingCount: number;
+  alreadyRatedByMe: boolean;
 };
 
 const STATUS_LABELS: Record<Offer["status"], string> = {
@@ -81,9 +92,15 @@ export default function OffersList({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar name={offer.developer?.full_name ?? null} role="developer" size="sm" />
-                <h3 className="font-display text-base font-semibold text-ink">
-                  {offer.developer?.full_name ?? "İsimsiz Yazılımcı"}
-                </h3>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display text-base font-semibold text-ink">
+                      {offer.developer?.full_name ?? "İsimsiz Yazılımcı"}
+                    </h3>
+                    <AvailabilityBadge availability={offer.developer?.availability ?? null} />
+                  </div>
+                  <RatingStars average={offer.developerRatingAvg} count={offer.developerRatingCount} />
+                </div>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -145,6 +162,16 @@ export default function OffersList({
                   Reddet
                 </button>
               </div>
+            )}
+
+            {offer.status === "accepted" && (
+              <RateOfferForm
+                offerId={offer.id}
+                raterId={founderId}
+                ratedUserId={offer.developer_id}
+                ratedUserLabel={offer.developer?.full_name ?? "İsimsiz Yazılımcı"}
+                alreadyRated={offer.alreadyRatedByMe}
+              />
             )}
 
             <ChatBox

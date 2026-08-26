@@ -13,7 +13,7 @@ type Notification = {
   created_at: string;
 };
 
-export default function NotificationBell({ userId }: { userId: string }) {
+export default function NotificationBell({ userId, enabled = true }: { userId: string; enabled?: boolean }) {
   const router = useRouter();
   const supabase = createClient();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -21,6 +21,8 @@ export default function NotificationBell({ userId }: { userId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!enabled) return;
+
     async function fetchNotifications() {
       const { data } = await supabase
         .from("notifications")
@@ -34,7 +36,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 20000);
     return () => clearInterval(interval);
-  }, [userId, supabase]);
+  }, [userId, enabled, supabase]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -45,6 +47,8 @@ export default function NotificationBell({ userId }: { userId: string }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!enabled) return null;
 
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
