@@ -15,16 +15,24 @@ import {
   Briefcase,
   PanelLeftClose,
   PanelLeftOpen,
+  FolderKanban,
+  ChevronDown,
 } from "lucide-react";
 import LogoutButton from "./logout-button";
 import Avatar from "./avatar";
 import RatingStars from "./rating-stars";
 import AvailabilityBadge from "./availability-badge";
 
-const NAV_ITEMS = [
-  { href: "/panel", label: "Keşfet", icon: Compass },
+const NAV_ITEMS = [{ href: "/panel", label: "Keşfet", icon: Compass }];
+
+const SECONDARY_NAV_ITEMS = [
   { href: "/profil", label: "Profilim", icon: User },
   { href: "/ayarlar", label: "Ayarlar", icon: Settings },
+];
+
+const PROJECT_SUB_ITEMS = [
+  { href: "/projelerim/aktif", label: "Üzerinde Çalıştıklarım" },
+  { href: "/projelerim/teklifler", label: "Tekliflerim" },
 ];
 
 const BADGE_ICONS = {
@@ -62,6 +70,7 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [projectsOpen, setProjectsOpen] = useState(true);
 
   useEffect(() => {
     try {
@@ -103,6 +112,76 @@ export default function Sidebar({
 
       <nav className="flex flex-col gap-1 px-2 md:px-3">
         {NAV_ITEMS.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              title={item.label}
+              className={`flex items-center justify-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors md:justify-start ${
+                active
+                  ? "border-coral bg-white text-coral-dark shadow-sm"
+                  : "border-transparent text-ink-soft hover:bg-white/60 hover:text-ink"
+              }`}
+            >
+              <Icon size={20} className="shrink-0" />
+              <span className={labelClass}>{item.label}</span>
+            </Link>
+          );
+        })}
+
+        {userType === "developer" && (
+          <div>
+            <div
+              className={`flex items-center rounded-lg border-l-4 transition-colors md:justify-start ${
+                pathname.startsWith("/projelerim")
+                  ? "border-coral bg-white text-coral-dark shadow-sm"
+                  : "border-transparent text-ink-soft hover:bg-white/60 hover:text-ink"
+              }`}
+            >
+              <Link
+                href="/projelerim/aktif"
+                title="Projelerim"
+                className="flex flex-1 items-center justify-center gap-3 px-3 py-2.5 text-sm font-medium md:justify-start"
+              >
+                <FolderKanban size={20} className="shrink-0" />
+                <span className={labelClass}>Projelerim</span>
+              </Link>
+              <button
+                onClick={() => setProjectsOpen((o) => !o)}
+                title={projectsOpen ? "Alt menüyü kapat" : "Alt menüyü aç"}
+                className={`shrink-0 pr-3 ${labelClass}`}
+              >
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${projectsOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+
+            {projectsOpen && !collapsed && (
+              <div className="mt-1 hidden flex-col gap-0.5 border-l border-ink/10 pl-4 md:flex">
+                {PROJECT_SUB_ITEMS.map((sub) => {
+                  const active = pathname === sub.href;
+                  return (
+                    <Link
+                      key={sub.href}
+                      href={sub.href}
+                      className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
+                        active ? "text-coral-dark" : "text-ink-soft hover:text-ink"
+                      }`}
+                    >
+                      {sub.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {SECONDARY_NAV_ITEMS.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (

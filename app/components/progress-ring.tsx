@@ -2,10 +2,13 @@ export default function ProgressRing({
   value,
   size = 44,
   strokeWidth = 4,
+  ringColor = "var(--color-periwinkle-dark)",
 }: {
   value: number;
   size?: number;
   strokeWidth?: number;
+  /** Halkanın rengi. Verilmezse mevcut davranış (periwinkle-dark) korunur. */
+  ringColor?: string;
 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -28,7 +31,7 @@ export default function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="var(--color-periwinkle-dark)"
+          stroke={ringColor}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={offset}

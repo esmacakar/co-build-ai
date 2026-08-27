@@ -37,13 +37,39 @@ export default function PrdStatus({ projectId }: { projectId: string }) {
           clearInterval(interval);
           setStatusText("PRD hazır, kaydediliyor...");
 
-          await supabase
+          const { error } = await supabase
             .from("projects")
             .update({
               generated_prd: data.prd,
               required_skills: data.skills,
+              // Semantik Eşleştirme Motoru'nun bulduğu top-5 yazılımcı listesi
+              // (bkz. matched-developers.tsx).
+              onerilen_gelistiriciler: data.onerilen_gelistiriciler ?? [],
             })
             .eq("id", projectId);
+
+          if (error) {
+            // En olası sebep: "onerilen_gelistiriciler" kolonu henüz
+            // Supabase'de oluşturulmadı (bkz. onerilen_gelistiriciler_kolonu.sql).
+            // O alan olmadan TEKRAR deniyoruz ki PRD hiçbir şekilde kaybolmasın
+            // ve sayfa sonsuz "hazırlanıyor" döngüsüne girmesin.
+            console.error("PRD kaydedilirken hata (onerilen_gelistiriciler ile):", error);
+
+            const { error: yedekHata } = await supabase
+              .from("projects")
+              .update({
+                generated_prd: data.prd,
+                required_skills: data.skills,
+              })
+              .eq("id", projectId);
+
+            if (yedekHata) {
+              console.error("PRD kaydedilirken hata (yedek deneme):", yedekHata);
+              setHataOldu(true);
+              setStatusText("PRD üretildi ama kaydedilirken bir hata oluştu: " + yedekHata.message);
+              return;
+            }
+          }
 
           router.refresh();
         } else if (data.status === "error") {
@@ -51,9 +77,11 @@ export default function PrdStatus({ projectId }: { projectId: string }) {
           setHataOldu(true);
           setStatusText("Bir hata oluştu: " + data.message);
         }
-      } catch {
-        // Sunucuya anlık ulaşılamazsa sessizce tekrar dener,
-        // ama üstteki 5 dakikalık genel zaman aşımı yine de geçerli olur.
+      } catch (err) {
+        // Sunucuya anlık ulaşılamazsa sessizce tekrar dener (network hatası
+        // olabilir), ama en azından konsola yazıyoruz ki teşhis edilebilsin.
+        // Üstteki 5 dakikalık genel zaman aşımı yine de geçerli olur.
+        console.warn("AI sunucusuna ulaşılamadı, tekrar denenecek:", err);
       }
     }, 4000);
 

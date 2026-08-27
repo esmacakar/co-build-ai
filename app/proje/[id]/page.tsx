@@ -1,5 +1,6 @@
 import PrdStatus from "./prd-status";
 import EditablePrd from "./editable-prd";
+import MatchedDevelopers, { type EslesenGelistirici } from "./matched-developers";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { PublishForm, PaymentEditor } from "./payment-section";
@@ -184,9 +185,20 @@ export default async function ProjeDetay({
     }
   }
 
+  // Semantik Eşleştirme Motoru'nun PRD üretimi bitince kaydettiği top-5
+  // yazılımcı listesi (bkz. prd-status.tsx). Kolon henüz yoksa/boşsa
+  // MatchedDevelopers zaten hiçbir şey render etmiyor.
+  const onerilenGelistiriciler = (project.onerilen_gelistiriciler ?? []) as EslesenGelistirici[];
+
+  // PRD + eşleşen yazılımcılar iki sütun halinde gösterileceği için (sadece
+  // founder, PRD zaten üretilmişken) bu durumda sayfayı biraz genişletiyoruz.
+  // Diğer tüm durumlarda (developer görünümü, PRD henüz yok vb.) mevcut dar
+  // okuma genişliği (max-w-2xl) aynen korunuyor.
+  const ikiSutunluGorunum = !developerView && !!project.generated_prd;
+
   return (
     <div className="min-h-screen bg-background px-6 py-10 sm:px-12">
-      <div className="mx-auto max-w-2xl">
+      <div className={`mx-auto ${ikiSutunluGorunum ? "max-w-5xl" : "max-w-2xl"}`}>
         <a href="/panel" className="text-sm font-medium text-ink-soft hover:text-ink">
           ← Panele Dön
         </a>
@@ -240,7 +252,11 @@ export default async function ProjeDetay({
               <PrdStatus projectId={project.id} />
             ) : (
               <>
-                <EditablePrd projectId={project.id} initialPrd={project.generated_prd} />
+                {/* PRD (sol) ve AI'nin eşleştirdiği yazılımcılar (sağ) yan yana */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-start">
+                  <EditablePrd projectId={project.id} initialPrd={project.generated_prd} />
+                  <MatchedDevelopers gelistiriciler={onerilenGelistiriciler} />
+                </div>
 
                 {project.status === "draft" && (
                   <div className="mt-8 flex flex-col items-center gap-3 rounded-xl border border-coral/30 bg-petal/30 p-6 text-center">

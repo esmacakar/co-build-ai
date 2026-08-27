@@ -36,7 +36,9 @@ export async function POST() {
   }
   const offerIds = [...new Set([...(devOffers ?? []), ...projectOffers].map((o) => o.id))];
 
+  // Puanlar tekliflere bağlı, o yüzden tekliflerden ÖNCE silinmeli
   if (offerIds.length > 0) {
+    await admin.from("ratings").delete().in("offer_id", offerIds);
     await admin.from("messages").delete().in("offer_id", offerIds);
     await admin.from("offers").delete().in("id", offerIds);
   }
@@ -58,6 +60,11 @@ export async function POST() {
   if (ownProjectIds.length > 0) {
     await admin.from("projects").delete().in("id", ownProjectIds);
   }
+
+  // Profil silinmeden önce, bu kullanıcıyı işaret eden puanlar temizlenmeli
+  // (yukarıdaki teklif bazlı silme bunları çoğunlukla kapsar, bu bir güvence)
+  await admin.from("ratings").delete().eq("rater_id", userId);
+  await admin.from("ratings").delete().eq("rated_user_id", userId);
 
   await admin.from("profiles").delete().eq("id", userId);
 
