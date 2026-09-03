@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 type Notification = {
@@ -66,19 +67,19 @@ export default function NotificationBell({ userId, enabled = true }: { userId: s
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative text-lg leading-none text-ink-soft hover:text-ink"
+        className="relative text-ink-soft hover:text-ink"
         aria-label="Bildirimler"
       >
-        🔔
+        <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-coral text-[10px] font-bold text-white">
+          <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-coral text-[10px] font-bold text-white shadow-[0_2px_6px_rgba(239,68,104,0.5)]">
             {unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl border border-ink/10 bg-white p-2 shadow-lg">
+        <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl bg-white p-3 shadow-[0_8px_20px_rgba(17,24,39,0.10),0_32px_70px_rgba(17,24,39,0.20)]">
           {notifications.length === 0 ? (
             <p className="p-4 text-center text-sm text-ink-soft">Henüz bildirim yok.</p>
           ) : (
@@ -87,7 +88,7 @@ export default function NotificationBell({ userId, enabled = true }: { userId: s
                 <button
                   key={n.id}
                   onClick={() => handleClick(n)}
-                  className={`rounded-lg p-3 text-left text-sm hover:bg-background ${
+                  className={`rounded-lg p-3 text-left text-sm hover:bg-ink/5 ${
                     n.read_at ? "text-ink-soft" : "font-semibold text-ink"
                   }`}
                 >

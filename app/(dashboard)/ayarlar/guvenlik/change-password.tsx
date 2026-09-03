@@ -37,22 +37,22 @@ export default function ChangePassword() {
   }
 
   return (
-    <div className="rounded-xl border border-ink/10 bg-white p-6">
-      <h2 className="font-display text-lg font-semibold text-ink">Şifre Değiştir</h2>
+    <div className="rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-8">
+      <h2 className="text-lg font-bold text-ink">Şifre Değiştir</h2>
       <div className="mt-4 flex flex-col gap-3 sm:max-w-sm">
         <input
           type="password"
           placeholder="Yeni şifre"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-ink/15 px-4 py-2.5 text-sm outline-none focus:border-coral"
+          className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-coral/30"
         />
         <input
           type="password"
           placeholder="Yeni şifre (tekrar)"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="rounded-lg border border-ink/15 px-4 py-2.5 text-sm outline-none focus:border-coral"
+          className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-coral/30"
         />
 
         {message && (
@@ -64,7 +64,7 @@ export default function ChangePassword() {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="self-start rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+          className="self-start rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
         >
           {saving ? "Kaydediliyor..." : "Şifreyi Güncelle"}
         </button>

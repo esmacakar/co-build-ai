@@ -1,6 +1,6 @@
 import PrdStatus from "./prd-status";
 import EditablePrd from "./editable-prd";
-import MatchedDevelopers, { type EslesenGelistirici } from "./matched-developers";
+import MatchedDevelopers, { type MatchedDeveloper } from "./matched-developers";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { PublishForm, PaymentEditor } from "./payment-section";
@@ -14,6 +14,7 @@ type OfferRow = {
   proof_link: string | null;
   payment_type: "fixed" | "equity" | null;
   status: "pending" | "accepted" | "rejected";
+  completed_at: string | null;
   developer_id: string;
 };
 
@@ -133,7 +134,7 @@ export default async function ProjeDetay({
 
     const founderRating = await fetchRatingSummary(supabase, project.founder_id);
     const alreadyRatedByMe =
-      myOffer && myOffer.status === "accepted" ? await hasRated(supabase, myOffer.id, user.id) : false;
+      myOffer && myOffer.completed_at ? await hasRated(supabase, myOffer.id, user.id) : false;
 
     developerView = {
       alreadyAccepted: !!ndaAcceptance,
@@ -172,7 +173,7 @@ export default async function ProjeDetay({
       offers = await Promise.all(
         offersData.map(async (o) => {
           const rating = await fetchRatingSummary(supabase, o.developer_id);
-          const alreadyRatedByMe = o.status === "accepted" ? await hasRated(supabase, o.id, user.id) : false;
+          const alreadyRatedByMe = o.completed_at ? await hasRated(supabase, o.id, user.id) : false;
           return {
             ...o,
             developer: devProfiles?.find((p) => p.id === o.developer_id) ?? null,
@@ -185,26 +186,25 @@ export default async function ProjeDetay({
     }
   }
 
-  // Semantik Eşleştirme Motoru'nun PRD üretimi bitince kaydettiği top-5
-  // yazılımcı listesi (bkz. prd-status.tsx). Kolon henüz yoksa/boşsa
-  // MatchedDevelopers zaten hiçbir şey render etmiyor.
-  const onerilenGelistiriciler = (project.onerilen_gelistiriciler ?? []) as EslesenGelistirici[];
+  // PRD üretimi bitince beceri uyumuna göre hesaplanan top-5 yazılımcı listesi
+  // (bkz. prd-status.tsx). Boşsa MatchedDevelopers zaten hiçbir şey render etmiyor.
+  const matchedDevelopers = (project.matched_developers ?? []) as MatchedDeveloper[];
 
   // PRD + eşleşen yazılımcılar iki sütun halinde gösterileceği için (sadece
   // founder, PRD zaten üretilmişken) bu durumda sayfayı biraz genişletiyoruz.
   // Diğer tüm durumlarda (developer görünümü, PRD henüz yok vb.) mevcut dar
   // okuma genişliği (max-w-2xl) aynen korunuyor.
-  const ikiSutunluGorunum = !developerView && !!project.generated_prd;
+  const twoColumnLayout = !developerView && !!project.generated_prd;
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 sm:px-12">
-      <div className={`mx-auto ${ikiSutunluGorunum ? "max-w-5xl" : "max-w-2xl"}`}>
+      <div className={`mx-auto ${twoColumnLayout ? "max-w-5xl" : "max-w-2xl"}`}>
         <a href="/panel" className="text-sm font-medium text-ink-soft hover:text-ink">
           ← Panele Dön
         </a>
 
         <div className="mt-6 flex items-center justify-between">
-          <h1 className="font-display text-2xl font-semibold text-ink">
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink">
             {project.title}
           </h1>
           <span
@@ -255,11 +255,11 @@ export default async function ProjeDetay({
                 {/* PRD (sol) ve AI'nin eşleştirdiği yazılımcılar (sağ) yan yana */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-start">
                   <EditablePrd projectId={project.id} initialPrd={project.generated_prd} />
-                  <MatchedDevelopers gelistiriciler={onerilenGelistiriciler} />
+                  <MatchedDevelopers developers={matchedDevelopers} />
                 </div>
 
                 {project.status === "draft" && (
-                  <div className="mt-8 flex flex-col items-center gap-3 rounded-xl border border-coral/30 bg-petal/30 p-6 text-center">
+                  <div className="mt-8 flex flex-col items-center gap-3 rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-6 text-center">
                     <p className="text-sm text-ink-soft">
                       PRD&apos;yi inceledin mi? Her şey doğru görünüyorsa, ödeme
                       tipini seçip projeni yazılımcılara açabilirsin.

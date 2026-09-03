@@ -34,7 +34,7 @@ export default function DeleteAccount({ userEmail }: { userEmail: string }) {
 
   return (
     <div className="rounded-xl border border-coral/30 bg-coral/5 p-6">
-      <h2 className="font-display text-lg font-semibold text-coral-dark">Tehlikeli Bölge</h2>
+      <h2 className="text-lg font-bold text-coral-dark">Tehlikeli Bölge</h2>
       <p className="mt-2 text-sm text-ink-soft">
         Hesabını sildiğinde profilin, projelerin, tekliflerin, mesajların ve tüm diğer
         verilerin kalıcı olarak silinir. Bu işlem <strong>geri alınamaz</strong>.
@@ -57,7 +57,7 @@ export default function DeleteAccount({ userEmail }: { userEmail: string }) {
         <button
           onClick={handleDelete}
           disabled={!canDelete || deleting}
-          className="self-start rounded-full bg-coral-dark px-6 py-2 text-sm font-semibold text-white hover:bg-coral disabled:cursor-not-allowed disabled:opacity-40"
+          className="self-start rounded-full bg-coral-dark px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_#8a1a37,0_10px_20px_rgba(209,39,74,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_#8a1a37,0_2px_6px_rgba(209,39,74,0.30)] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {deleting ? "Siliniyor..." : "Hesabımı Kalıcı Olarak Sil"}
         </button>

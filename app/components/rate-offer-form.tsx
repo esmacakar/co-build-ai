@@ -47,7 +47,7 @@ export default function RateOfferForm({
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-ink/10 bg-background/60 p-3">
+    <div className="mt-3 rounded-lg bg-ink/5 p-3">
       <p className="text-xs font-semibold text-ink">{ratedUserLabel}&apos;ı değerlendir</p>
       <div className="mt-2 flex gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
@@ -72,12 +72,12 @@ export default function RateOfferForm({
         onChange={(e) => setComment(e.target.value)}
         placeholder="Kısa bir yorum (isteğe bağlı)"
         rows={2}
-        className="mt-2 w-full resize-none rounded-lg border border-ink/15 px-3 py-2 text-xs outline-none focus:border-coral"
+        className="mt-2 w-full resize-none rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-coral/30"
       />
       <button
         onClick={handleSubmit}
         disabled={score === 0 || saving}
-        className="mt-2 rounded-full bg-coral px-4 py-1.5 text-xs font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+        className="mt-2 rounded-full bg-coral px-4 py-1.5 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
       >
         {saving ? "Gönderiliyor..." : "Değerlendirmeyi Gönder"}
       </button>

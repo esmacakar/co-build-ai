@@ -17,6 +17,7 @@ import {
   PanelLeftOpen,
   FolderKanban,
   ChevronDown,
+  Star,
 } from "lucide-react";
 import LogoutButton from "./logout-button";
 import Avatar from "./avatar";
@@ -25,14 +26,24 @@ import AvailabilityBadge from "./availability-badge";
 
 const NAV_ITEMS = [{ href: "/panel", label: "Keşfet", icon: Compass }];
 
-const SECONDARY_NAV_ITEMS = [
-  { href: "/profil", label: "Profilim", icon: User },
-  { href: "/ayarlar", label: "Ayarlar", icon: Settings },
-];
+const SECONDARY_NAV_ITEMS = [{ href: "/profil", label: "Profilim", icon: User }];
 
-const PROJECT_SUB_ITEMS = [
+const DEVELOPER_PROJECT_SUB_ITEMS = [
   { href: "/projelerim/aktif", label: "Üzerinde Çalıştıklarım" },
   { href: "/projelerim/teklifler", label: "Tekliflerim" },
+];
+
+const FOUNDER_PROJECT_SUB_ITEMS = [
+  { href: "/projelerim/yururlukte", label: "Yürürlükteki Projelerim" },
+  { href: "/projelerim/kabul-ettiklerim", label: "Kabul Ettiğim Teklifler" },
+];
+
+const SETTINGS_SUB_ITEMS = [
+  { href: "/ayarlar/hesap", label: "Hesap" },
+  { href: "/ayarlar/guvenlik", label: "Güvenlik" },
+  { href: "/ayarlar/bildirimler", label: "Bildirimler" },
+  { href: "/ayarlar/tercihler", label: "Tercihler" },
+  { href: "/ayarlar/tehlikeli-bolge", label: "Tehlikeli Bölge" },
 ];
 
 const BADGE_ICONS = {
@@ -63,7 +74,7 @@ export default function Sidebar({
   userType: "founder" | "developer" | null;
   userName: string | null;
   badges: Badge[];
-  miniStats: { label: string; value: string | number }[];
+  miniStats: { label: string; value: string | number; href?: string }[];
   ratingAvg: number | null;
   ratingCount: number;
   availability: string | null;
@@ -71,6 +82,7 @@ export default function Sidebar({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -95,55 +107,80 @@ export default function Sidebar({
   const labelClass = collapsed ? "hidden" : "hidden md:inline";
   const blockClass = collapsed ? "hidden" : "hidden md:block";
 
+  const groupLabelClass = collapsed ? "hidden" : "hidden px-3 md:block";
+
   return (
-    <aside className={`flex shrink-0 flex-col bg-sidebar py-6 ${collapsed ? "w-16" : "w-16 md:w-60"}`}>
+    <aside className={`flex shrink-0 flex-col border-r border-ink/10 bg-sidebar py-6 ${collapsed ? "w-16" : "w-16 md:w-64"}`}>
       <div className="mb-6 flex items-center justify-between px-3 md:px-5">
         <Link href="/panel" className={blockClass}>
-          <span className="font-display text-lg font-semibold text-ink">Co-Build AI</span>
+          <span className="text-lg font-bold text-ink">Co-Build AI</span>
         </Link>
         <button
           onClick={toggleCollapsed}
           title={collapsed ? "Menüyü genişlet" : "Menüyü daralt"}
-          className="hidden rounded-lg p-1.5 text-ink-soft hover:bg-white/60 hover:text-ink md:block"
+          className="hidden rounded-lg p-1.5 text-ink-soft hover:bg-ink/5 hover:text-ink md:block"
         >
           {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
         </button>
       </div>
 
-      <nav className="flex flex-col gap-1 px-2 md:px-3">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
+      <nav className="flex flex-col gap-4 px-2 md:px-3">
+        <div className="flex flex-col gap-1">
+          <p className={`mb-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/70 ${groupLabelClass}`}>
+            Ana Menü
+          </p>
+          {NAV_ITEMS.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
+                className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
+                  active
+                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                    : "text-ink hover:bg-ink/5"
+                }`}
+              >
+                <Icon size={20} className="shrink-0" />
+                <span className={labelClass}>{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {userType === "founder" && (
             <Link
-              key={item.href}
-              href={item.href}
-              title={item.label}
-              className={`flex items-center justify-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors md:justify-start ${
-                active
-                  ? "border-coral bg-white text-coral-dark shadow-sm"
-                  : "border-transparent text-ink-soft hover:bg-white/60 hover:text-ink"
+              href="/yildizlarim"
+              title="Yıldızlılarım"
+              className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
+                pathname === "/yildizlarim"
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  : "text-ink hover:bg-ink/5"
               }`}
             >
-              <Icon size={20} className="shrink-0" />
-              <span className={labelClass}>{item.label}</span>
+              <Star size={20} className="shrink-0" />
+              <span className={labelClass}>Yıldızlılarım</span>
             </Link>
-          );
-        })}
+          )}
+        </div>
 
-        {userType === "developer" && (
-          <div>
+        {(userType === "developer" || userType === "founder") && (
+          <div className="flex flex-col gap-1">
+            <p className={`mb-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/70 ${groupLabelClass}`}>
+              Projelerim
+            </p>
             <div
-              className={`flex items-center rounded-lg border-l-4 transition-colors md:justify-start ${
+              className={`flex items-center rounded-full transition-colors md:justify-start ${
                 pathname.startsWith("/projelerim")
-                  ? "border-coral bg-white text-coral-dark shadow-sm"
-                  : "border-transparent text-ink-soft hover:bg-white/60 hover:text-ink"
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  : "text-ink hover:bg-ink/5"
               }`}
             >
               <Link
-                href="/projelerim/aktif"
+                href={userType === "developer" ? "/projelerim/aktif" : "/projelerim/yururlukte"}
                 title="Projelerim"
-                className="flex flex-1 items-center justify-center gap-3 px-3 py-2.5 text-sm font-medium md:justify-start"
+                className="flex flex-1 items-center justify-center gap-3 px-3.5 py-2.5 text-sm font-semibold md:justify-start"
               >
                 <FolderKanban size={20} className="shrink-0" />
                 <span className={labelClass}>Projelerim</span>
@@ -151,7 +188,7 @@ export default function Sidebar({
               <button
                 onClick={() => setProjectsOpen((o) => !o)}
                 title={projectsOpen ? "Alt menüyü kapat" : "Alt menüyü aç"}
-                className={`shrink-0 pr-3 ${labelClass}`}
+                className={`shrink-0 pr-3.5 ${labelClass}`}
               >
                 <ChevronDown
                   size={16}
@@ -161,15 +198,90 @@ export default function Sidebar({
             </div>
 
             {projectsOpen && !collapsed && (
-              <div className="mt-1 hidden flex-col gap-0.5 border-l border-ink/10 pl-4 md:flex">
-                {PROJECT_SUB_ITEMS.map((sub) => {
+              <div className="ml-5 mt-1 hidden flex-col border-l border-ink/10 md:flex">
+                {(userType === "developer" ? DEVELOPER_PROJECT_SUB_ITEMS : FOUNDER_PROJECT_SUB_ITEMS).map(
+                  (sub) => {
+                    const active = pathname === sub.href;
+                    return (
+                      <Link
+                        key={sub.href}
+                        href={sub.href}
+                        className={`relative flex items-center gap-2 py-1.5 pl-4 pr-3 text-xs font-medium transition-colors before:absolute before:left-0 before:top-1/2 before:h-px before:w-3 before:bg-ink/15 ${
+                          active ? "text-coral font-semibold" : "text-ink hover:text-coral"
+                        }`}
+                      >
+                        {sub.label}
+                      </Link>
+                    );
+                  }
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-1">
+          <p className={`mb-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/70 ${groupLabelClass}`}>
+            Hesap
+          </p>
+          {SECONDARY_NAV_ITEMS.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
+                className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
+                  active
+                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                    : "text-ink hover:bg-ink/5"
+                }`}
+              >
+                <Icon size={20} className="shrink-0" />
+                <span className={labelClass}>{item.label}</span>
+              </Link>
+            );
+          })}
+
+          <div>
+            <div
+              className={`flex items-center rounded-full transition-colors md:justify-start ${
+                pathname.startsWith("/ayarlar")
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  : "text-ink hover:bg-ink/5"
+              }`}
+            >
+              <Link
+                href="/ayarlar/hesap"
+                title="Ayarlar"
+                className="flex flex-1 items-center justify-center gap-3 px-3.5 py-2.5 text-sm font-semibold md:justify-start"
+              >
+                <Settings size={20} className="shrink-0" />
+                <span className={labelClass}>Ayarlar</span>
+              </Link>
+              <button
+                onClick={() => setSettingsOpen((o) => !o)}
+                title={settingsOpen ? "Alt menüyü kapat" : "Alt menüyü aç"}
+                className={`shrink-0 pr-3.5 ${labelClass}`}
+              >
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${settingsOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+
+            {settingsOpen && !collapsed && (
+              <div className="ml-5 mt-1 hidden flex-col border-l border-ink/10 md:flex">
+                {SETTINGS_SUB_ITEMS.map((sub) => {
                   const active = pathname === sub.href;
                   return (
                     <Link
                       key={sub.href}
                       href={sub.href}
-                      className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
-                        active ? "text-coral-dark" : "text-ink-soft hover:text-ink"
+                      className={`relative flex items-center gap-2 py-1.5 pl-4 pr-3 text-xs font-medium transition-colors before:absolute before:left-0 before:top-1/2 before:h-px before:w-3 before:bg-ink/15 ${
+                        active ? "text-coral font-semibold" : "text-ink hover:text-coral"
                       }`}
                     >
                       {sub.label}
@@ -179,89 +291,71 @@ export default function Sidebar({
               </div>
             )}
           </div>
-        )}
-
-        {SECONDARY_NAV_ITEMS.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={item.label}
-              className={`flex items-center justify-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm font-medium transition-colors md:justify-start ${
-                active
-                  ? "border-coral bg-white text-coral-dark shadow-sm"
-                  : "border-transparent text-ink-soft hover:bg-white/60 hover:text-ink"
-              }`}
-            >
-              <Icon size={20} className="shrink-0" />
-              <span className={labelClass}>{item.label}</span>
-            </Link>
-          );
-        })}
-
-        {userType === "founder" && (
-          <>
-            <div className="my-2 border-t border-ink/10" />
-            <Link
-              href="/fikir-ekle"
-              title="Fikir Ekle"
-              className="flex items-center justify-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:bg-white/60 hover:text-ink md:justify-start"
-            >
-              <Lightbulb size={20} className="shrink-0" />
-              <span className={labelClass}>Fikir Ekle</span>
-            </Link>
-          </>
-        )}
+        </div>
       </nav>
 
       {/* Rozetler, mini istatistikler — sadece genişletilmiş sidebar'da */}
-      <div className={`mt-6 flex-1 flex-col gap-5 overflow-y-auto border-t border-ink/10 px-4 pt-5 ${collapsed ? "hidden" : "hidden md:flex"}`}>
-        <div>
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-soft">
-            Rozetler
-          </p>
-          <div className="mt-2 flex gap-2">
+      <div className={`mt-6 flex-1 flex-col gap-4 overflow-y-auto px-3 pt-2 ${collapsed ? "hidden" : "hidden md:flex"}`}>
+        {badges.length > 0 && (
+          <div className="flex gap-1.5">
             {badges.map((badge) => {
               const Icon = BADGE_ICONS[badge.icon];
               return (
-                <div key={badge.id} title={badge.label} className="group relative">
+                <div key={badge.id} title={badge.label}>
                   <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                      badge.earned ? "bg-petal text-coral-dark" : "bg-ink/5 text-ink-soft/40"
+                    className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                      badge.earned ? "bg-periwinkle/30 text-periwinkle-dark" : "bg-ink/5 text-ink-soft/40"
                     }`}
                   >
-                    <Icon size={16} />
+                    <Icon size={14} />
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        )}
 
-        <div className="flex flex-col gap-2">
-          {miniStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex items-center justify-between rounded-lg bg-white/60 px-3 py-2"
-            >
-              <span className="text-xs text-ink-soft">{stat.label}</span>
-              <span className="font-display text-sm font-bold text-ink">{stat.value}</span>
-            </div>
-          ))}
-        </div>
+        {miniStats.length > 0 && (
+          <div className="flex flex-col gap-3 rounded-2xl bg-gradient-to-br from-coral to-coral-dark p-4 text-white shadow-sm">
+            {miniStats.map((stat, i) => {
+              const content = (
+                <>
+                  <span className="text-xs text-white/70">{stat.label}</span>
+                  <span className="text-lg font-bold">{stat.value}</span>
+                </>
+              );
+              return stat.href ? (
+                <Link
+                  key={stat.label}
+                  href={stat.href}
+                  className={`flex items-center justify-between transition-opacity hover:opacity-80 ${
+                    i > 0 ? "border-t border-white/15 pt-3" : ""
+                  }`}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div
+                  key={stat.label}
+                  className={`flex items-center justify-between ${i > 0 ? "border-t border-white/15 pt-3" : ""}`}
+                >
+                  {content}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="border-t border-ink/10 px-2 pt-3 md:px-3">
         <Link
           href="/ayarlar"
-          className="flex items-center justify-center gap-2.5 rounded-lg px-1 py-2 transition-colors hover:bg-white/60 md:justify-start"
+          className="flex items-center justify-center gap-2.5 rounded-lg px-1 py-2 transition-colors hover:bg-ink/5 md:justify-start"
         >
           <Avatar name={userName} role={userType === "founder" ? "founder" : "developer"} size="sm" />
           <div className={`min-w-0 ${blockClass}`}>
-            <p className="truncate text-sm font-semibold text-ink">{userName ?? "Kullanıcı"}</p>
-            <p className="text-xs text-ink-soft">
+            <p className="truncate text-sm font-bold text-ink">{userName ?? "Kullanıcı"}</p>
+            <p className="text-xs text-ink">
               {userType === "founder" ? "Fikir Sahibi" : "Yazılımcı"}
             </p>
             {userType === "developer" && (

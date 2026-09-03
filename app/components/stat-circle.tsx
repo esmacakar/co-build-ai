@@ -1,6 +1,6 @@
 const TONES = {
   pink: "bg-petal text-coral-dark",
-  lime: "bg-periwinkle/40 text-periwinkle-dark",
+  lime: "bg-periwinkle/30 text-periwinkle-dark",
   dark: "bg-ink text-white",
 };
 
@@ -25,5 +25,24 @@ export default function StatCircle({
         {label}
       </span>
     </div>
+  );
+}
+
+export function StatPill({
+  value,
+  label,
+  tone = "lime",
+}: {
+  value: string | number;
+  label: string;
+  tone?: keyof typeof TONES;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ${TONES[tone]}`}
+    >
+      <span className="font-display text-sm font-bold">{value}</span>
+      {label}
+    </span>
   );
 }

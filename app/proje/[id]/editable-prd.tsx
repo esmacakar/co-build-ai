@@ -29,12 +29,12 @@ export default function EditablePrd({
   }
 
   return (
-    <div className="mt-8 rounded-xl border border-ink/10 border-l-4 border-l-periwinkle-dark bg-white p-6 shadow-sm">
+    <div className="mt-8 rounded-xl bg-white p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)]">
       <span className="inline-flex items-center rounded-full bg-petal px-3 py-1 font-mono text-xs font-medium text-coral-dark">
         AI Tarafından Üretildi
       </span>
       <div className="mt-3 flex items-center justify-between">
-        <h2 className="font-display text-xl font-semibold text-ink">
+        <h2 className="text-xl font-bold text-ink">
           Ürün Gereksinim Dokümanı (PRD)
         </h2>
         {!editing && (
@@ -59,7 +59,7 @@ export default function EditablePrd({
             <button
               onClick={handleSave}
               disabled={saving}
-              className="rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-coral-dark disabled:opacity-50"
+              className="rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
             >
               {saving ? "Kaydediliyor..." : "Kaydet"}
             </button>
@@ -68,7 +68,7 @@ export default function EditablePrd({
                 setText(initialPrd);
                 setEditing(false);
               }}
-              className="rounded-full border border-ink/15 px-6 py-2 text-sm font-semibold text-ink-soft hover:text-ink"
+              className="rounded-full bg-ink/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(17,24,39,0.06)] active:shadow-[inset_0_2px_4px_rgba(17,24,39,0.10)] active:translate-y-px px-6 py-2.5 text-sm font-semibold text-ink-soft hover:bg-ink/10 hover:text-ink"
             >
               Vazgeç
             </button>

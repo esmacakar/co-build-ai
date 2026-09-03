@@ -14,20 +14,20 @@ export default function TrendingWidget({
   return (
     <div className="flex flex-col gap-6">
       {trendingProjects.length > 0 && (
-        <div className="rounded-xl border border-ink/10 bg-white p-4">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
-            🔥 Öne Çıkan Projeler
+        <div className="rounded-2xl bg-blue-200 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(96,165,250,0.6),0_4px_14px_rgba(59,130,246,0.15),0_28px_55px_rgba(59,130,246,0.25)]">
+          <p className="text-[11px] font-extrabold uppercase tracking-wide text-blue-900">
+            Öne Çıkan Projeler
           </p>
-          <div className="mt-3 flex flex-col gap-3">
+          <div className="mt-4 flex flex-col gap-4">
             {trendingProjects.map((p, i) => (
               <a
                 key={p.id}
                 href={`/proje/${p.id}`}
-                className="flex items-center gap-2 text-sm transition-colors hover:text-coral-dark"
+                className="flex items-center gap-2 text-sm text-blue-900 transition-opacity hover:opacity-70"
               >
-                <span className="font-display font-bold text-ink-soft">{i + 1}</span>
-                <span className="min-w-0 flex-1 truncate text-ink">{p.title}</span>
-                <span className="shrink-0 text-xs text-ink-soft">{p.offerCount} teklif</span>
+                <span className="font-bold text-blue-700">{i + 1}</span>
+                <span className="min-w-0 flex-1 truncate">{p.title}</span>
+                <span className="shrink-0 text-xs text-blue-700">{p.offerCount} teklif</span>
               </a>
             ))}
           </div>
@@ -35,16 +35,16 @@ export default function TrendingWidget({
       )}
 
       {trendingDevelopers.length > 0 && (
-        <div className="rounded-xl border border-ink/10 bg-white p-4">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
-            ⭐ En Aktif Yazılımcılar
+        <div className="rounded-2xl bg-blue-200 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(96,165,250,0.6),0_4px_14px_rgba(59,130,246,0.15),0_28px_55px_rgba(59,130,246,0.25)]">
+          <p className="text-[11px] font-extrabold uppercase tracking-wide text-blue-900">
+            En Aktif Yazılımcılar
           </p>
-          <div className="mt-3 flex flex-col gap-3">
+          <div className="mt-4 flex flex-col gap-4">
             {trendingDevelopers.map((d) => (
               <div key={d.id} className="flex items-center gap-2">
                 <Avatar name={d.full_name} role="developer" size="sm" />
-                <span className="min-w-0 flex-1 truncate text-sm text-ink">{d.full_name ?? "İsimsiz"}</span>
-                <span className="shrink-0 text-xs text-ink-soft">{d.acceptedCount} kabul</span>
+                <span className="min-w-0 flex-1 truncate text-sm text-blue-900">{d.full_name ?? "İsimsiz"}</span>
+                <span className="shrink-0 text-xs text-blue-700">{d.acceptedCount} kabul</span>
               </div>
             ))}
           </div>

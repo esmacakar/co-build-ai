@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Avatar from "@/app/components/avatar";
 
-export default async function UzerindeCalistiklarim() {
+export default async function YururluktekiProjelerim() {
   const supabase = await createClient();
 
   const {
@@ -19,58 +19,61 @@ export default async function UzerindeCalistiklarim() {
     .eq("id", user.id)
     .single();
 
-  // Sadece yazılımcılar bu sayfayı görebilir
-  if (profile?.user_type !== "developer") {
+  // Sadece founder'lar bu sayfayı görebilir
+  if (profile?.user_type !== "founder") {
     redirect("/panel");
   }
 
-  const { data: offers } = await supabase
-    .from("offers")
-    .select("id, project_id, payment_type, proposed_amount")
-    .eq("developer_id", user.id)
-    .eq("status", "accepted")
-    .order("created_at", { ascending: false });
+  const { data: myProjects } = await supabase
+    .from("projects")
+    .select("id, title")
+    .eq("founder_id", user.id);
 
-  const projectIds = (offers ?? []).map((o) => o.project_id);
+  const projectIds = (myProjects ?? []).map((p) => p.id);
 
-  let projects: { id: string; title: string; founder_id: string }[] = [];
-  let founders: { id: string; full_name: string | null }[] = [];
+  let offers: {
+    id: string;
+    project_id: string;
+    developer_id: string;
+    payment_type: "fixed" | "equity" | null;
+    proposed_amount: number | null;
+  }[] = [];
 
   if (projectIds.length > 0) {
-    const { data: projectsData } = await supabase
-      .from("projects")
-      .select("id, title, founder_id")
-      .in("id", projectIds);
-    projects = projectsData ?? [];
-
-    const founderIds = [...new Set(projects.map((p) => p.founder_id))];
-    if (founderIds.length > 0) {
-      const { data: foundersData } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("id", founderIds);
-      founders = foundersData ?? [];
-    }
+    const { data } = await supabase
+      .from("offers")
+      .select("id, project_id, developer_id, payment_type, proposed_amount")
+      .in("project_id", projectIds)
+      .eq("status", "accepted")
+      .is("completed_at", null);
+    offers = data ?? [];
   }
 
-  const items = (offers ?? []).map((o) => {
-    const project = projects.find((p) => p.id === o.project_id);
-    const founder = project ? founders.find((f) => f.id === project.founder_id) : null;
-    return { ...o, project, founder };
-  });
+  const developerIds = [...new Set(offers.map((o) => o.developer_id))];
+  let developers: { id: string; full_name: string | null }[] = [];
+  if (developerIds.length > 0) {
+    const { data } = await supabase.from("profiles").select("id, full_name").in("id", developerIds);
+    developers = data ?? [];
+  }
+
+  const items = offers.map((o) => ({
+    ...o,
+    project: myProjects?.find((p) => p.id === o.project_id),
+    developer: developers.find((d) => d.id === o.developer_id),
+  }));
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Üzerinde Çalıştıklarım</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Yürürlükteki Projelerim</h1>
       <p className="mt-1 text-sm text-ink-soft">
-        Teklifin kabul edildiği, şu an aktif olarak çalıştığın projeler.
+        Bir teklifi kabul ettiğin, şu an aktif olarak devam eden projelerin.
       </p>
 
       {items.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-ink/15 bg-white/60 p-10 text-center">
           <p className="text-2xl">🛠️</p>
           <p className="mt-2 text-sm text-ink-soft">
-            Henüz üzerinde çalıştığın bir proje yok — teklifin kabul edildiğinde burada görünecek.
+            Şu an yürürlükte bir proje yok — bir teklif kabul ettiğinde burada görünecek.
           </p>
         </div>
       ) : (
@@ -85,9 +88,9 @@ export default async function UzerindeCalistiklarim() {
                 {item.project?.title ?? "Bilinmeyen Proje"}
               </h3>
               <div className="mt-2 flex items-center gap-2">
-                <Avatar name={item.founder?.full_name ?? null} role="founder" size="sm" />
+                <Avatar name={item.developer?.full_name ?? null} role="developer" size="sm" />
                 <span className="text-xs text-ink-soft">
-                  {item.founder?.full_name ?? "İsimsiz Fikir Sahibi"}
+                  {item.developer?.full_name ?? "İsimsiz Yazılımcı"}
                 </span>
               </div>
               {item.payment_type && (

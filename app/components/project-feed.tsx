@@ -1,0 +1,49 @@
+import Avatar from "./avatar";
+
+type Project = {
+  id: string;
+  title: string;
+  raw_idea: string;
+  required_skills: string[] | null;
+  founderName: string | null;
+};
+
+export default function ProjectFeed({ projects }: { projects: Project[] }) {
+  if (projects.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)]">
+      <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
+        🌊 Fikirler Akışı
+      </p>
+      <div className="mt-3 flex max-h-[520px] flex-col gap-2 overflow-y-auto pr-1">
+        {projects.map((p) => (
+          <a
+            key={p.id}
+            href={`/proje/${p.id}`}
+            className="block rounded-xl bg-petal/60 p-3 transition-colors hover:bg-petal"
+          >
+            <p className="text-sm font-bold text-ink">{p.title}</p>
+            <div className="mt-1 flex items-center gap-1.5">
+              <Avatar name={p.founderName} role="founder" size="sm" />
+              <span className="text-xs text-ink-soft">{p.founderName ?? "İsimsiz"}</span>
+            </div>
+            <p className="mt-2 line-clamp-2 text-xs text-ink-soft">{p.raw_idea}</p>
+            {p.required_skills && p.required_skills.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {p.required_skills.slice(0, 4).map((skill) => (
+                  <span
+                    key={skill}
+                    className="rounded-full bg-white px-2 py-0.5 font-mono text-[10px] text-ink-soft"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}

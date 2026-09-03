@@ -123,7 +123,7 @@ export default async function Profil() {
             role={profile?.user_type === "founder" ? "founder" : "developer"}
             size="lg"
           />
-          <h1 className="mt-4 font-display text-3xl font-bold text-ink sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             {profile?.full_name ?? "Profilim"}
           </h1>
           <p className="mt-2 text-sm text-ink-soft">
@@ -150,7 +150,7 @@ export default async function Profil() {
           </div>
 
           {profile?.user_type === "founder" && (
-            <a href="/fikir-ekle" className="mt-6 inline-block rounded-full bg-coral px-8 py-3.5 text-base font-semibold text-white transition-colors hover:bg-coral-dark">
+            <a href="/fikir-ekle" className="mt-6 inline-block rounded-full bg-coral px-8 py-3.5 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)]">
               + Yeni Fikir Ekle
             </a>
           )}
@@ -170,7 +170,7 @@ export default async function Profil() {
                     <a
                       key={offer.id}
                       href={`/proje/${offer.project_id}`}
-                      className="flex items-center gap-3 rounded-lg border border-ink/10 bg-white p-3 transition-colors hover:border-coral/40"
+                      className="flex items-center gap-3 rounded-lg bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-4 transition-all [transform-style:preserve-3d] hover:[transform:perspective(900px)_rotateX(2deg)_translateY(-4px)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_4px_14px_rgba(17,24,39,0.08),0_28px_60px_rgba(17,24,39,0.16)]"
                     >
                       <Avatar name={offer.developerName} role="developer" size="sm" />
                       <p className="min-w-0 flex-1 truncate text-sm text-ink">
@@ -199,8 +199,10 @@ export default async function Profil() {
         {profile?.user_type === "developer" && (
           <EditProfile
             userId={user.id}
+            fullName={profile?.full_name ?? null}
             initialBio={profile?.bio ?? null}
             initialSkills={profile?.skills ?? null}
+            initialCvUrl={profile?.cv_url ?? null}
           />
         )}
 
@@ -218,7 +220,7 @@ export default async function Profil() {
                 <a
                   key={offer.id}
                   href={`/proje/${offer.project_id}`}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-ink/10 bg-white p-3 transition-colors hover:border-coral/40"
+                  className="flex items-center justify-between gap-3 rounded-lg bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-4 transition-all [transform-style:preserve-3d] hover:[transform:perspective(900px)_rotateX(2deg)_translateY(-4px)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_4px_14px_rgba(17,24,39,0.08),0_28px_60px_rgba(17,24,39,0.16)]"
                 >
                   <p className="min-w-0 flex-1 truncate text-sm text-ink">
                     {offer.projectTitle ?? "Bilinmeyen Proje"}

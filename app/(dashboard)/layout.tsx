@@ -27,7 +27,7 @@ export default async function DashboardLayout({
   const userType = profile?.user_type ?? null;
 
   let badges: Badge[] = [];
-  let miniStats: { label: string; value: string | number }[] = [];
+  let miniStats: { label: string; value: string | number; href?: string }[] = [];
 
   const { data: myRatings } = await supabase.from("ratings").select("score").eq("rated_user_id", user.id);
   const ratingScores = myRatings ?? [];
@@ -61,8 +61,8 @@ export default async function DashboardLayout({
     ];
 
     miniStats = [
-      { label: "Analiz Edilen Fikirler", value: projectCount },
-      { label: "Gelen Teklifler", value: offersReceived },
+      { label: "Analiz Edilen Fikirler", value: projectCount, href: "/profil" },
+      { label: "Gelen Teklifler", value: offersReceived, href: "/profil" },
     ];
   } else if (userType === "developer") {
     const { count: portfolioCount } = await supabase

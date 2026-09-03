@@ -16,6 +16,7 @@ type Offer = {
   proof_link: string | null;
   payment_type: "fixed" | "equity" | null;
   status: "pending" | "accepted" | "rejected";
+  completed_at: string | null;
   developer: {
     full_name: string | null;
     bio: string | null;
@@ -70,6 +71,20 @@ export default function OffersList({
     setUpdatingId(null);
   }
 
+  async function handleMarkCompleted(offer: Offer) {
+    setUpdatingId(offer.id);
+    const completedAt = new Date().toISOString();
+    await supabase.from("offers").update({ completed_at: completedAt }).eq("id", offer.id);
+    await supabase.from("notifications").insert({
+      user_id: offer.developer_id,
+      project_id: projectId,
+      type: "project_completed",
+      message: `"${projectTitle}" projesi tamamlandı olarak işaretlendi. Artık değerlendirme yapabilirsin.`,
+    });
+    setOffers((prev) => prev.map((o) => (o.id === offer.id ? { ...o, completed_at: completedAt } : o)));
+    setUpdatingId(null);
+  }
+
   if (offers.length === 0) {
     return (
       <div className="mt-8 rounded-xl border border-dashed border-ink/15 bg-white/60 p-8 text-center">
@@ -88,13 +103,13 @@ export default function OffersList({
       </p>
       <div className="mt-3 flex flex-col gap-4">
         {offers.map((offer) => (
-          <div key={offer.id} className="rounded-xl border border-ink/10 bg-white p-5">
+          <div key={offer.id} className="rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar name={offer.developer?.full_name ?? null} role="developer" size="sm" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-display text-base font-semibold text-ink">
+                    <h3 className="text-base font-bold text-ink">
                       {offer.developer?.full_name ?? "İsimsiz Yazılımcı"}
                     </h3>
                     <AvailabilityBadge availability={offer.developer?.availability ?? null} />
@@ -104,14 +119,16 @@ export default function OffersList({
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  offer.status === "accepted"
+                  offer.completed_at
                     ? "bg-periwinkle-dark text-white"
+                    : offer.status === "accepted"
+                    ? "bg-petal text-coral-dark"
                     : offer.status === "rejected"
                     ? "bg-coral/10 text-coral-dark"
                     : "bg-petal text-coral-dark"
                 }`}
               >
-                {STATUS_LABELS[offer.status]}
+                {offer.completed_at ? "Tamamlandı" : STATUS_LABELS[offer.status]}
               </span>
             </div>
 
@@ -150,21 +167,33 @@ export default function OffersList({
                 <button
                   onClick={() => handleUpdateStatus(offer, "accepted")}
                   disabled={updatingId === offer.id}
-                  className="rounded-full bg-coral px-5 py-2 text-sm font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+                  className="rounded-full bg-coral px-5 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
                 >
                   Kabul Et
                 </button>
                 <button
                   onClick={() => handleUpdateStatus(offer, "rejected")}
                   disabled={updatingId === offer.id}
-                  className="rounded-full border border-ink/15 px-5 py-2 text-sm font-semibold text-ink-soft hover:text-ink disabled:opacity-50"
+                  className="rounded-full bg-ink/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(17,24,39,0.06)] active:shadow-[inset_0_2px_4px_rgba(17,24,39,0.10)] active:translate-y-px px-5 py-2.5 text-sm font-semibold text-ink-soft hover:bg-ink/10 hover:text-ink disabled:opacity-50"
                 >
                   Reddet
                 </button>
               </div>
             )}
 
-            {offer.status === "accepted" && (
+            {offer.status === "accepted" && !offer.completed_at && (
+              <div className="mt-4">
+                <button
+                  onClick={() => handleMarkCompleted(offer)}
+                  disabled={updatingId === offer.id}
+                  className="rounded-full border border-periwinkle-dark/40 px-5 py-2 text-sm font-semibold text-periwinkle-dark hover:bg-periwinkle/10 disabled:opacity-50"
+                >
+                  Projeyi Tamamlandı Olarak İşaretle
+                </button>
+              </div>
+            )}
+
+            {offer.completed_at && (
               <RateOfferForm
                 offerId={offer.id}
                 raterId={founderId}

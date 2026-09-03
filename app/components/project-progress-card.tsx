@@ -11,10 +11,10 @@ export default function ProjectProgressCard({
   return (
     <a
       href={`/proje/${project.id}`}
-      className="block rounded-xl border border-ink/10 bg-white p-4 transition-colors hover:border-coral/40"
+      className="block rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-6 transition-all [transform-style:preserve-3d] hover:[transform:perspective(900px)_rotateX(2deg)_translateY(-4px)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_4px_14px_rgba(17,24,39,0.08),0_28px_60px_rgba(17,24,39,0.16)]"
     >
       <div className="flex items-center justify-between gap-3">
-        <h3 className="truncate font-display text-sm font-semibold text-ink">{project.title}</h3>
+        <h3 className="truncate text-sm font-bold text-ink">{project.title}</h3>
         <span className="shrink-0 rounded-full bg-petal px-2.5 py-0.5 text-xs font-bold text-coral-dark">
           {project.progress}%
         </span>

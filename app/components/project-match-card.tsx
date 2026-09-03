@@ -14,9 +14,9 @@ export default function ProjectMatchCard({
   };
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-ink/10 bg-white p-4 transition-colors hover:border-coral/40">
+    <div className="group relative overflow-hidden rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-6 transition-all [transform-style:preserve-3d] hover:[transform:perspective(900px)_rotateX(2deg)_translateY(-4px)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_4px_14px_rgba(17,24,39,0.08),0_28px_60px_rgba(17,24,39,0.16)]">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="truncate font-display text-sm font-semibold text-ink">{project.title}</h3>
+        <h3 className="truncate text-sm font-bold text-ink">{project.title}</h3>
         {project.matchScore > 0 && <ProgressRing value={project.matchScore} size={40} strokeWidth={4} />}
       </div>
 
@@ -43,7 +43,7 @@ export default function ProjectMatchCard({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-full justify-end bg-gradient-to-t from-white via-white/95 to-transparent p-3 pt-6 transition-transform duration-200 group-hover:translate-y-0 group-hover:pointer-events-auto">
         <a
           href={`/proje/${project.id}`}
-          className="rounded-full bg-coral px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-coral-dark"
+          className="rounded-full bg-coral px-4 py-1.5 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)]"
         >
           Detayları Gör →
         </a>

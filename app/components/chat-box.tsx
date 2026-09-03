@@ -9,6 +9,7 @@ type Message = {
   sender_id: string;
   content: string;
   created_at: string;
+  read_at?: string | null;
 };
 
 function formatTime(iso: string) {
@@ -44,6 +45,15 @@ export default function ChatBox({
       .order("created_at", { ascending: true })
       .then(({ data }) => {
         if (active && data) setMessages(data);
+
+        // Karşı taraftan gelen, henüz okunmamış mesajları okundu işaretle
+        supabase
+          .from("messages")
+          .update({ read_at: new Date().toISOString() })
+          .eq("offer_id", offerId)
+          .neq("sender_id", userId)
+          .is("read_at", null)
+          .then();
       });
 
     const channel = supabase
@@ -61,7 +71,7 @@ export default function ChatBox({
       active = false;
       supabase.removeChannel(channel);
     };
-  }, [offerId, supabase]);
+  }, [offerId, userId, supabase]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -89,7 +99,7 @@ export default function ChatBox({
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-ink/10 bg-background/60 p-3">
+    <div id={`chat-${offerId}`} className="mt-4 scroll-mt-24 rounded-lg bg-ink/5 p-3">
       <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
         Mesajlar
       </p>
@@ -128,12 +138,12 @@ export default function ChatBox({
             if (e.key === "Enter") handleSend();
           }}
           placeholder="Mesaj yaz..."
-          className="flex-1 rounded-lg border border-ink/15 px-3 py-2 text-sm outline-none focus:border-coral"
+          className="flex-1 rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
         />
         <button
           onClick={handleSend}
           disabled={sending}
-          className="rounded-lg bg-coral px-4 py-2 text-sm font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+          className="rounded-lg bg-coral px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
         >
           Gönder
         </button>

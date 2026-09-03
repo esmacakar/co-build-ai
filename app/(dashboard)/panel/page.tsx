@@ -1,10 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import StatCircle from "@/app/components/stat-circle";
+import { StatPill } from "@/app/components/stat-circle";
 import DeveloperProjects from "./developer-projects";
 import TrendingWidget from "@/app/components/trending-widget";
 import QuickMatch from "./quick-match";
+import DirectSearch from "./direct-search";
 import FounderDevelopers from "./founder-developers";
+import CancelProcessingProject from "./cancel-processing-project";
+import DeveloperFeed from "@/app/components/developer-feed";
+import ProjectFeed from "@/app/components/project-feed";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -101,6 +105,15 @@ export default async function Panel() {
     }
   }
 
+  let starredIds: string[] = [];
+  if (profile?.user_type === "founder") {
+    const { data: starredData } = await supabase
+      .from("starred_developers")
+      .select("developer_id")
+      .eq("founder_id", user.id);
+    starredIds = (starredData ?? []).map((s) => s.developer_id);
+  }
+
   let processingProjects: any[] = [];
   if (profile?.user_type === "founder") {
     const { data } = await supabase
@@ -164,16 +177,34 @@ export default async function Panel() {
     }
   }
 
+  const profileIncomplete =
+    profile?.user_type === "developer" &&
+    (!profile?.bio || !profile?.skills || profile.skills.length === 0 || !profile?.cv_url);
+
   return (
     <div>
+      {profileIncomplete && (
+        <div className="mb-8 flex items-center gap-3 rounded-lg border border-periwinkle-dark/30 bg-periwinkle/10 px-4 py-3 text-sm text-ink">
+          <span className="text-lg">✨</span>
+          <span className="flex-1">
+            Profilini tamamla — biyografi, beceri ve CV eklemek, eşleştirme motorunun seni doğru projelerle
+            eşleştirmesini kolaylaştırır.
+          </span>
+          <a href="/profil" className="shrink-0 font-semibold text-coral-dark hover:underline">
+            Profili Tamamla →
+          </a>
+        </div>
+      )}
+
       {processingProjects.length > 0 && (
         <div className="mb-8 flex flex-col gap-2">
           {processingProjects.map((p) => (
             <a key={p.id} href={`/proje/${p.id}`} className="flex items-center gap-3 rounded-lg border border-coral/30 bg-petal/30 px-4 py-3 text-sm text-ink transition-colors hover:bg-petal/50">
               <span className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-coral border-t-transparent" />
-              <span>
+              <span className="flex-1">
                 <strong>{p.title}</strong> için PRD hazırlanıyor, görmek için tıkla →
               </span>
+              <CancelProcessingProject projectId={p.id} />
             </a>
           ))}
         </div>
@@ -181,13 +212,23 @@ export default async function Panel() {
 
       <div className="mx-auto flex max-w-6xl items-start gap-8">
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-ink">
               {getGreeting()}
-              {profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}!
+              {profile?.full_name ? (
+                <>
+                  ,{" "}
+                  <span className="bg-gradient-to-r from-coral to-periwinkle-dark bg-clip-text text-transparent">
+                    {profile.full_name.split(" ")[0]}
+                  </span>
+                </>
+              ) : (
+                ""
+              )}
+              !
             </h1>
-            <p className="mt-2 text-sm text-ink-soft">
+            <p className="mt-1 text-sm text-ink-soft">
               {profile?.user_type === "founder"
                 ? "Projene uygun yazılımcıları keşfet."
                 : "Sana uygun yayınlanmış projeleri keşfet."}
@@ -195,9 +236,9 @@ export default async function Panel() {
           </div>
 
           {profile?.user_type === "developer" ? (
-            <StatCircle value={projects.length} label="Yayınlanmış Proje" tone="pink" />
+            <StatPill value={projects.length} label="Yayınlanmış Proje" tone="lime" />
           ) : (
-            <StatCircle value={developers.length} label="Kayıtlı Yazılımcı" tone="lime" />
+            <StatPill value={developers.length} label="Kayıtlı Yazılımcı" tone="lime" />
           )}
         </div>
 
@@ -205,14 +246,22 @@ export default async function Panel() {
 
         {profile?.user_type === "founder" && (
           <div className="mt-8">
-            <QuickMatch userId={user.id} developers={developers} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <QuickMatch userId={user.id} developers={developers} starredIds={starredIds} />
+              <DirectSearch founderId={user.id} developers={developers} starredIds={starredIds} />
+            </div>
             <FounderDevelopers developers={developers} />
           </div>
         )}
       </div>
 
-      <div className="hidden w-72 shrink-0 lg:block">
+      <div className="hidden w-72 shrink-0 flex-col gap-6 lg:flex">
         <TrendingWidget trendingProjects={trendingProjects} trendingDevelopers={trendingDevelopers} />
+        {profile?.user_type === "founder" ? (
+          <DeveloperFeed developers={developers} />
+        ) : (
+          <ProjectFeed projects={projects} />
+        )}
       </div>
       </div>
     </div>

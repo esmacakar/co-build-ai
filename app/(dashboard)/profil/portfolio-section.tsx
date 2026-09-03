@@ -68,7 +68,7 @@ export default function PortfolioSection({
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-ink">
+        <h2 className="text-lg font-bold text-ink">
           Projeler ve Sertifikalar
         </h2>
         <button
@@ -84,16 +84,20 @@ export default function PortfolioSection({
           <div className="flex gap-3">
             <button
               onClick={() => setItemType("project")}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-                itemType === "project" ? "bg-coral text-white" : "border border-ink/15 text-ink-soft"
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                itemType === "project"
+                  ? "bg-coral text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_0_var(--color-coral-dark),0_6px_14px_rgba(239,68,104,0.30)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.25)]"
+                  : "bg-ink/5 text-ink-soft shadow-[inset_0_1px_3px_rgba(17,24,39,0.06)]"
               }`}
             >
               Proje
             </button>
             <button
               onClick={() => setItemType("certificate")}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-                itemType === "certificate" ? "bg-periwinkle-dark text-white" : "border border-ink/15 text-ink-soft"
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                itemType === "certificate"
+                  ? "bg-periwinkle-dark text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_0_#5b21b6,0_6px_14px_rgba(109,40,217,0.30)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_#5b21b6,0_2px_6px_rgba(109,40,217,0.25)]"
+                  : "bg-ink/5 text-ink-soft shadow-[inset_0_1px_3px_rgba(17,24,39,0.06)]"
               }`}
             >
               Sertifika
@@ -106,14 +110,14 @@ export default function PortfolioSection({
               placeholder={itemType === "project" ? "Proje adı" : "Sertifika adı"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+              className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
             />
             <textarea
               placeholder="Açıklama (isteğe bağlı)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              className="resize-none rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+              className="resize-none rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
             />
             {itemType === "certificate" && (
               <input
@@ -121,26 +125,26 @@ export default function PortfolioSection({
                 placeholder="Veren kurum (örn. Google, Udemy)"
                 value={issuer}
                 onChange={(e) => setIssuer(e.target.value)}
-                className="rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+                className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
               />
             )}
             <input
               type="date"
               value={itemDate}
               onChange={(e) => setItemDate(e.target.value)}
-              className="rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+              className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
             />
             <input
               type="text"
               placeholder="Link (GitHub, sertifika linki, vb. — isteğe bağlı)"
               value={fileUrl}
               onChange={(e) => setFileUrl(e.target.value)}
-              className="rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+              className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
             />
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="self-start rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+              className="self-start rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
             >
               {saving ? "Ekleniyor..." : "Ekle"}
             </button>
@@ -226,9 +230,9 @@ function ItemCard({
   }, [item.file_url]);
 
   return (
-    <div className="flex items-start justify-between rounded-lg border border-ink/10 bg-white p-4">
+    <div className="flex items-start justify-between rounded-lg bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-6">
       <div>
-        <p className="text-sm font-semibold text-ink">{item.title}</p>
+        <p className="text-sm font-bold text-ink">{item.title}</p>
         {item.issuer && <p className="text-xs text-ink-soft">{item.issuer}</p>}
         {item.description && <p className="mt-1 text-xs text-ink-soft">{item.description}</p>}
         <div className="mt-1 flex gap-3 text-xs text-ink-soft">

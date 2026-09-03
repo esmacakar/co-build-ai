@@ -41,8 +41,8 @@ export default function FounderDefaults({
   }
 
   return (
-    <div className="rounded-xl border border-ink/10 bg-white p-6">
-      <h2 className="font-display text-lg font-semibold text-ink">Varsayılan Proje Tercihleri</h2>
+    <div className="rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.05),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] p-8">
+      <h2 className="text-lg font-bold text-ink">Varsayılan Proje Tercihleri</h2>
       <p className="mt-1 text-sm text-ink-soft">
         Yeni bir proje yayınlarken ödeme formunun başlangıç değeri olarak kullanılır.
       </p>
@@ -53,8 +53,10 @@ export default function FounderDefaults({
             key={t}
             type="button"
             onClick={() => setType(t)}
-            className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold ${
-              type === t ? "bg-coral text-white" : "border border-ink/15 text-ink-soft"
+            className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+              type === t
+                ? "bg-coral text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_0_var(--color-coral-dark),0_6px_14px_rgba(239,68,104,0.30)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.25)]"
+                : "bg-ink/5 text-ink-soft shadow-[inset_0_1px_3px_rgba(17,24,39,0.06)]"
             }`}
           >
             {TYPE_LABELS[t]}
@@ -69,14 +71,14 @@ export default function FounderDefaults({
           placeholder={type === "fixed" ? "Varsayılan tutar (₺)" : "Varsayılan pay (%)"}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="mt-3 w-full max-w-sm rounded-lg border border-ink/15 px-4 py-2 text-sm outline-none focus:border-coral"
+          className="mt-3 w-full max-w-sm rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
         />
       )}
 
       <button
         onClick={handleSave}
         disabled={saving}
-        className="mt-3 rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white hover:bg-coral-dark disabled:opacity-50"
+        className="mt-3 rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
       >
         {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
       </button>

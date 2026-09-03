@@ -77,8 +77,8 @@ export default function FikirEkle() {
   }
   return (
     <div className="flex min-h-screen flex-col items-center bg-background px-6 py-16">
-      <div className="w-full max-w-xl">
-        <h1 className="text-center font-display text-3xl font-semibold text-ink">
+      <div className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_8px_rgba(17,24,39,0.05),0_16px_40px_rgba(17,24,39,0.10)] sm:p-10">
+        <h1 className="text-center text-3xl font-extrabold tracking-tight text-ink">
           Fikrini Anlat
         </h1>
         <p className="mt-2 text-center text-sm text-ink-soft">
@@ -98,7 +98,7 @@ export default function FikirEkle() {
               placeholder="örn. Komşular Arası Eşya Paylaşım Uygulaması"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-ink/15 px-4 py-2.5 text-ink outline-none focus:border-coral"
+              className="mt-1 w-full rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-ink outline-none focus:ring-2 focus:ring-coral/30"
             />
           </div>
 
@@ -113,7 +113,7 @@ export default function FikirEkle() {
               placeholder="Ne yapmak istiyorsun? Kim kullanacak? Hangi sorunu çözüyor? Aklına gelen her şeyi yaz, ne kadar detaylı olursa o kadar iyi."
               value={rawIdea}
               onChange={(e) => setRawIdea(e.target.value)}
-              className="mt-1 w-full resize-none rounded-lg border border-ink/15 px-4 py-2.5 text-ink outline-none focus:border-coral"
+              className="mt-1 w-full resize-none rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-ink outline-none focus:ring-2 focus:ring-coral/30"
             />
           </div>
 
@@ -122,7 +122,7 @@ export default function FikirEkle() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-full bg-coral px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-coral-dark disabled:opacity-50"
+            className="mt-2 rounded-full bg-coral px-6 py-3 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:opacity-50"
           >
             {loading ? "Kaydediliyor..." : "Fikrimi Kaydet"}
           </button>
