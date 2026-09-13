@@ -8,6 +8,7 @@ import StatCircle from "@/app/components/stat-circle";
 import ProfileIdentity from "./profile-identity";
 import { getActiveRole } from "@/app/lib/roles";
 import BadgesSection, { type Badge } from "@/app/components/badges-section";
+import PatentBadge from "@/app/components/patent-badge";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Bekliyor",
@@ -144,9 +145,12 @@ export default async function Profil() {
             initialFullName={profile?.full_name ?? null}
             initialAvatarUrl={profile?.avatar_url ?? null}
           />
-          <p className="mt-2 text-sm text-ink-soft">
-            {activeRole === "founder" ? "Fikir Sahibi" : "Yazılımcı"}
-          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <p className="text-sm text-ink-soft">
+              {activeRole === "founder" ? "Fikir Sahibi" : "Yazılımcı"}
+            </p>
+            {activeRole === "developer" && <PatentBadge hasPatent={profile?.has_verified_patent} />}
+          </div>
 
           <div className="mt-6 flex items-center gap-4">
             {activeRole === "founder" ? (

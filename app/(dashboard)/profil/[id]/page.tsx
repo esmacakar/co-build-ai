@@ -4,6 +4,7 @@ import Avatar from "@/app/components/avatar";
 import StatCircle from "@/app/components/stat-circle";
 import RatingStars from "@/app/components/rating-stars";
 import AvailabilityBadge from "@/app/components/availability-badge";
+import PatentBadge from "@/app/components/patent-badge";
 import BadgesSection, { type Badge } from "@/app/components/badges-section";
 import PortfolioSection from "../portfolio-section";
 import { canActAsDeveloper, canActAsFounder } from "@/app/lib/roles";
@@ -240,6 +241,7 @@ export default async function KullaniciProfili({
                 {viewedProfile.full_name ?? "İsimsiz Kullanıcı"}
               </h1>
               {isDeveloper && <AvailabilityBadge availability={viewedProfile.availability} />}
+              {isDeveloper && <PatentBadge hasPatent={viewedProfile.has_verified_patent} />}
             </div>
             <p className="mt-1 text-sm text-ink-soft">{roleLabel}</p>
             <div className="mt-1.5 flex justify-center sm:justify-start">

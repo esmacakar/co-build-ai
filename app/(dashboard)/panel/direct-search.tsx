@@ -6,6 +6,7 @@ import DeveloperMatchRow from "@/app/components/developer-match-row";
 type Developer = {
   id: string;
   availability: string | null;
+  has_verified_patent?: boolean | null;
   ratingAvg: number | null;
   ratingCount: number;
 };
@@ -23,6 +24,7 @@ type MatchedDeveloper = {
   ratingAvg: number | null;
   ratingCount: number;
   availability: string | null;
+  hasVerifiedPatent?: boolean | null;
 };
 
 export default function DirectSearch({
@@ -64,6 +66,7 @@ export default function DirectSearch({
           ratingAvg: local?.ratingAvg ?? null,
           ratingCount: local?.ratingCount ?? 0,
           availability: local?.availability ?? null,
+          hasVerifiedPatent: local?.has_verified_patent ?? false,
         };
       });
 

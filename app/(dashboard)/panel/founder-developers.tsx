@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import Avatar from "@/app/components/avatar";
 import RatingStars from "@/app/components/rating-stars";
 import AvailabilityBadge from "@/app/components/availability-badge";
+import PatentBadge from "@/app/components/patent-badge";
 
 type Developer = {
   id: string;
@@ -12,6 +13,7 @@ type Developer = {
   bio: string | null;
   skills: string[] | null;
   availability: string | null;
+  has_verified_patent?: boolean | null;
   ratingAvg: number | null;
   ratingCount: number;
 };
@@ -116,6 +118,7 @@ export default function FounderDevelopers({ developers }: { developers: Develope
                         {dev.full_name ?? "İsimsiz Yazılımcı"}
                       </h3>
                       <AvailabilityBadge availability={dev.availability} />
+                      <PatentBadge hasPatent={dev.has_verified_patent} />
                     </div>
                     <RatingStars average={dev.ratingAvg} count={dev.ratingCount} />
                   </div>

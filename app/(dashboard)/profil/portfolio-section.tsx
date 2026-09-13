@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
@@ -34,6 +34,35 @@ export default function PortfolioSection({
   const [issuer, setIssuer] = useState("");
   const [itemDate, setItemDate] = useState("");
   const [fileUrl, setFileUrl] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+
+    const ext = file.name.split(".").pop() ?? "pdf";
+    const path = `${userId}/${Date.now()}.${ext}`;
+
+    const { error: uploadErr } = await supabase.storage
+      .from("portfolyo-dosyalari")
+      .upload(path, file, { upsert: true, cacheControl: "3600" });
+
+    if (uploadErr) {
+      setUploadError("Dosya yüklenemedi, tekrar dener misin?");
+      setUploading(false);
+      return;
+    }
+
+    const { data } = supabase.storage.from("portfolyo-dosyalari").getPublicUrl(path);
+    setFileUrl(`${data.publicUrl}?t=${Date.now()}`);
+    setUploadedFileName(file.name);
+    setUploading(false);
+  }
 
   async function handleAdd() {
     if (!title.trim()) return;
@@ -56,6 +85,7 @@ export default function PortfolioSection({
     setIssuer("");
     setItemDate("");
     setFileUrl("");
+    setUploadedFileName(null);
     router.refresh();
   }
 
@@ -140,11 +170,48 @@ export default function PortfolioSection({
             />
             <input
               type="text"
-              placeholder="Link (GitHub, sertifika linki, vb. — isteğe bağlı)"
+              placeholder={
+                itemType === "certificate"
+                  ? "Sertifika linki (isteğe bağlı — ya da aşağıdan dosya yükle)"
+                  : "Link (GitHub, canlı demo, vb. — isteğe bağlı)"
+              }
               value={fileUrl}
-              onChange={(e) => setFileUrl(e.target.value)}
+              onChange={(e) => {
+                setFileUrl(e.target.value);
+                setUploadedFileName(null);
+              }}
               className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
             />
+
+            <div>
+              <label className="block text-xs font-medium text-ink-soft">
+                {itemType === "certificate" ? "Sertifika Dosyası Yükle" : "Kanıt Dosyası Yükle (isteğe bağlı)"}
+              </label>
+              <div className="mt-1 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="rounded-full bg-ink/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(17,24,39,0.06)] active:shadow-[inset_0_2px_4px_rgba(17,24,39,0.10)] active:translate-y-px px-5 py-2 text-sm font-semibold text-ink-soft hover:bg-ink/10 hover:text-ink disabled:opacity-50"
+                >
+                  {uploading ? "Yükleniyor..." : "Dosya Seç"}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                {uploadedFileName ? (
+                  <span className="truncate text-xs text-ink-soft">{uploadedFileName}</span>
+                ) : (
+                  <span className="text-xs text-ink-soft">PDF, JPG veya PNG</span>
+                )}
+              </div>
+              {uploadError && <p className="mt-1 text-xs text-coral-dark">{uploadError}</p>}
+            </div>
+
             <button
               onClick={handleAdd}
               disabled={saving}

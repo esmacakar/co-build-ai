@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { Star } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 import Avatar from "@/app/components/avatar";
 import ProgressRing from "@/app/components/progress-ring";
 
@@ -9,7 +14,15 @@ export type MatchedDeveloper = {
   matchScore: number;
 };
 
-export default function MatchedDevelopers({ developers }: { developers: MatchedDeveloper[] }) {
+export default function MatchedDevelopers({
+  developers,
+  founderId,
+  starredIds = [],
+}: {
+  developers: MatchedDeveloper[];
+  founderId: string;
+  starredIds?: string[];
+}) {
   if (!developers || developers.length === 0) {
     return null;
   }
@@ -27,41 +40,95 @@ export default function MatchedDevelopers({ developers }: { developers: MatchedD
 
       <div className="flex flex-col gap-4">
         {developers.map((dev) => (
-          <div key={dev.developerId} className="rounded-xl border border-stone-200 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_12px_rgba(17,24,39,0.12)] p-6">
-            <div className="flex items-start gap-3">
-              <Avatar name={dev.fullName} role="developer" size="md" />
-
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-base font-bold text-ink">
-                  {dev.fullName ?? "İsimsiz Yazılımcı"}
-                </h3>
-                {dev.bio && (
-                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-ink-soft">{dev.bio}</p>
-                )}
-              </div>
-
-              <ProgressRing value={dev.matchScore} size={44} strokeWidth={4} />
-            </div>
-
-            {dev.skills.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {dev.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="rounded-full bg-periwinkle/20 px-2.5 py-0.5 font-mono text-[11px] text-ink"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+          <MatchedDeveloperCard
+            key={dev.developerId}
+            developer={dev}
+            founderId={founderId}
+            initiallyStarred={starredIds.includes(dev.developerId)}
+          />
         ))}
       </div>
 
       <a href="/panel" className="mt-3 inline-block text-xs font-semibold text-coral-dark hover:underline">
         Keşfet&apos;te tüm yazılımcıları gör →
       </a>
+    </div>
+  );
+}
+
+function MatchedDeveloperCard({
+  developer,
+  founderId,
+  initiallyStarred,
+}: {
+  developer: MatchedDeveloper;
+  founderId: string;
+  initiallyStarred: boolean;
+}) {
+  const supabase = createClient();
+  const [starred, setStarred] = useState(initiallyStarred);
+  const [saving, setSaving] = useState(false);
+
+  async function toggleStar() {
+    if (saving) return;
+    setSaving(true);
+
+    if (starred) {
+      await supabase
+        .from("starred_developers")
+        .delete()
+        .eq("founder_id", founderId)
+        .eq("developer_id", developer.developerId);
+    } else {
+      await supabase
+        .from("starred_developers")
+        .insert({ founder_id: founderId, developer_id: developer.developerId });
+    }
+
+    setStarred((s) => !s);
+    setSaving(false);
+  }
+
+  return (
+    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_12px_rgba(17,24,39,0.12)] transition-all [transform-style:preserve-3d] hover:[transform:perspective(900px)_rotateX(2deg)_translateY(-4px)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_20px_rgba(17,24,39,0.16)]">
+      <div className="flex items-start gap-3">
+        <a href={`/profil/${developer.developerId}`} className="flex min-w-0 flex-1 items-start gap-3">
+          <Avatar name={developer.fullName} role="developer" size="md" />
+
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-base font-bold text-ink hover:underline">
+              {developer.fullName ?? "İsimsiz Yazılımcı"}
+            </h3>
+            {developer.bio && (
+              <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-ink-soft">{developer.bio}</p>
+            )}
+          </div>
+        </a>
+
+        <button
+          onClick={toggleStar}
+          disabled={saving}
+          title={starred ? "Yıldızı kaldır" : "Yıldızla"}
+          className="shrink-0 disabled:opacity-50"
+        >
+          <Star size={18} className={starred ? "fill-coral text-coral" : "text-ink/25 hover:text-coral"} />
+        </button>
+
+        <ProgressRing value={developer.matchScore} size={44} strokeWidth={4} />
+      </div>
+
+      {developer.skills.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {developer.skills.map((skill) => (
+            <span
+              key={skill}
+              className="rounded-full bg-periwinkle/20 px-2.5 py-0.5 font-mono text-[11px] text-ink"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

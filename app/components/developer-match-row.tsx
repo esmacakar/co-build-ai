@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import Avatar from "./avatar";
 import RatingStars from "./rating-stars";
 import AvailabilityBadge from "./availability-badge";
+import PatentBadge from "./patent-badge";
 
 export default function DeveloperMatchRow({
   developer,
@@ -19,6 +20,7 @@ export default function DeveloperMatchRow({
     ratingAvg: number | null;
     ratingCount: number;
     availability?: string | null;
+    hasVerifiedPatent?: boolean | null;
   };
   founderId: string;
   initiallyStarred?: boolean;
@@ -54,6 +56,7 @@ export default function DeveloperMatchRow({
             {developer.availability !== undefined && (
               <AvailabilityBadge availability={developer.availability ?? null} />
             )}
+            <PatentBadge hasPatent={developer.hasVerifiedPatent} />
           </div>
           <RatingStars average={developer.ratingAvg} count={developer.ratingCount} />
         </div>

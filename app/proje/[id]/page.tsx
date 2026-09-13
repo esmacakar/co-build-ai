@@ -195,6 +195,20 @@ export default async function ProjeDetay({
   // (bkz. prd-status.tsx). Boşsa MatchedDevelopers zaten hiçbir şey render etmiyor.
   const matchedDevelopers = (project.matched_developers ?? []) as MatchedDeveloper[];
 
+  // Bu 5 yazılımcıdan founder'ın daha önce yıldızladıklarını işaretleyebilmek için
+  let matchedStarredIds: string[] = [];
+  if (isFounder && matchedDevelopers.length > 0) {
+    const { data: starredData } = await supabase
+      .from("starred_developers")
+      .select("developer_id")
+      .eq("founder_id", user.id)
+      .in(
+        "developer_id",
+        matchedDevelopers.map((d) => d.developerId)
+      );
+    matchedStarredIds = (starredData ?? []).map((s) => s.developer_id);
+  }
+
   // PRD + eşleşen yazılımcılar iki sütun halinde gösterileceği için (sadece
   // founder, PRD zaten üretilmişken) bu durumda sayfayı biraz genişletiyoruz.
   // Diğer tüm durumlarda (developer görünümü, PRD henüz yok vb.) mevcut dar
@@ -260,7 +274,11 @@ export default async function ProjeDetay({
                 {/* PRD (sol) ve AI'nin eşleştirdiği yazılımcılar (sağ) yan yana */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-start">
                   <EditablePrd projectId={project.id} initialPrd={project.generated_prd} />
-                  <MatchedDevelopers developers={matchedDevelopers} />
+                  <MatchedDevelopers
+                    developers={matchedDevelopers}
+                    founderId={user.id}
+                    starredIds={matchedStarredIds}
+                  />
                 </div>
 
                 {project.status === "draft" && (
