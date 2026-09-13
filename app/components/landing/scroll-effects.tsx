@@ -112,10 +112,10 @@ export default function ScrollEffects() {
   }, []);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 h-[3px] bg-white/10">
+    <div className="fixed inset-x-0 top-0 z-50 h-[3px] bg-white/40">
       <div
         ref={barRef}
-        className="h-full w-0 bg-gradient-to-r from-[#cc0621] via-[#5f06cc] to-[#063ecc] transition-[width] duration-150 ease-out"
+        className="h-full w-0 bg-gradient-to-r from-[#FE9EC7] via-[#89D4FF] to-[#44ACFF] transition-[width] duration-150 ease-out"
       />
     </div>
   );

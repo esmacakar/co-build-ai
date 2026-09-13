@@ -31,10 +31,10 @@ export default function BenefitsSection() {
   return (
     <section className="px-6 py-20 sm:px-12">
       <div className="reveal mx-auto max-w-2xl text-center">
-        <span className="w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white">
+        <span className="w-fit text-sm font-semibold uppercase tracking-widest text-[#44ACFF]">
           Neden Co-Build AI?
         </span>
-        <h2 className="mt-4 font-[family-name:var(--font-clash-display)] text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <h2 className="mt-4 font-[family-name:var(--font-playfair)] text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
           Fikirle Yetenek Arasındaki Mesafeyi Kısaltıyoruz
         </h2>
       </div>
@@ -45,14 +45,14 @@ export default function BenefitsSection() {
           return (
             <div
               key={benefit.title}
-              className="reveal panel-3d flex gap-4 rounded-2xl bg-white p-6"
+              className="reveal flex gap-4 rounded-2xl bg-white/80 p-8 shadow-sm transition-shadow hover:shadow-md"
             >
-              <span className="icon-3d flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#5f06cc] text-white">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#44ACFF] text-white shadow-sm">
                 <Icon size={18} />
               </span>
               <div>
-                <h3 className="font-[family-name:var(--font-clash-display)] text-base font-bold text-[#111827]">{benefit.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-[#4b5563]">{benefit.description}</p>
+                <h3 className="text-base font-bold text-slate-800">{benefit.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{benefit.description}</p>
               </div>
             </div>
           );

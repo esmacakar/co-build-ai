@@ -6,18 +6,18 @@ export default function HeroSection() {
       <TypingText
         as="span"
         text="Fikrinden ürüne, AI ile"
-        className="reveal w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white"
+        className="reveal w-fit rounded-full bg-white/70 px-4 py-1.5 text-sm font-semibold uppercase tracking-widest text-[#44ACFF] shadow-sm"
         speed={42}
       />
 
-      <h1 className="reveal mt-6 font-[family-name:var(--font-clash-display)] text-6xl font-bold tracking-tight text-white sm:text-8xl lg:text-9xl">
+      <h1 className="reveal mt-6 font-[family-name:var(--font-playfair)] text-6xl font-bold tracking-tight text-slate-800 sm:text-8xl lg:text-9xl">
         Co-Build AI
       </h1>
 
       <TypingText
         as="p"
         text="Fikir sahipleri ile yazılımcıları Agentic RAG ve Semantik Arama teknolojileriyle buluşturan, %100 gizlilik odaklı derin öğrenme kuluçka merkezi."
-        className="reveal mt-6 max-w-2xl text-lg leading-relaxed text-white sm:text-xl"
+        className="reveal mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl"
         speed={24}
         startDelay={300}
       />

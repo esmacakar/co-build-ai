@@ -58,16 +58,16 @@ export default function DeleteAccount({ userEmail }: { userEmail: string }) {
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder={userEmail}
-            className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-coral/30"
+            className="rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-red-500/30"
           />
 
-          {error && <p className="text-sm text-coral-dark">{error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex gap-3">
             <button
               onClick={handleDelete}
               disabled={!canDelete || deleting}
-              className="rounded-full bg-coral px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_var(--color-coral-dark),0_10px_20px_rgba(239,68,104,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_var(--color-coral-dark),0_2px_6px_rgba(239,68,104,0.30)] disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_0_0_#b91c1c,0_10px_20px_rgba(220,38,38,0.35)] transition-all hover:brightness-105 active:translate-y-1 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_0px_0_0_#b91c1c,0_2px_6px_rgba(220,38,38,0.30)] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {deleting ? "Siliniyor..." : "Kalıcı Olarak Sil"}
             </button>

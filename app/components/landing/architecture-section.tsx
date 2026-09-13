@@ -35,13 +35,13 @@ const ITEMS = [
 export default function ArchitectureSection({ idSuffix = "" }: { idSuffix?: string }) {
   return (
     <section id={`nasil-calisir${idSuffix}`} className="px-6 py-20 sm:px-12">
-      <h2 className="reveal text-center font-[family-name:var(--font-clash-display)] text-3xl font-bold tracking-tight text-white">
+      <h2 className="reveal text-center font-[family-name:var(--font-playfair)] text-3xl font-bold tracking-tight text-slate-800">
         Arka Planda Ne Çalışıyor?
       </h2>
       <TypingText
         as="p"
         text="Fikrini yazdığın andan yazılımcıyla eşleştiğin ana kadar devrede olan teknoloji."
-        className="reveal mx-auto mt-3 max-w-xl text-center text-sm text-white"
+        className="reveal mx-auto mt-3 max-w-xl text-center text-sm text-slate-600"
         speed={26}
       />
 
@@ -51,20 +51,20 @@ export default function ArchitectureSection({ idSuffix = "" }: { idSuffix?: stri
           return (
             <div
               key={item.title}
-              className="reveal panel-3d flex flex-col rounded-2xl bg-white p-6"
+              className="reveal flex flex-col rounded-2xl bg-white/80 p-8 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="flex items-center justify-between">
-                <span className="icon-3d flex h-10 w-10 items-center justify-center rounded-full bg-[#063ecc] text-white">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#89D4FF] text-slate-800 shadow-sm">
                   <Icon size={18} />
                 </span>
                 {item.status === "soon" && (
-                  <span className="badge-soft rounded-full bg-black/5 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-[#4b5563]">
+                  <span className="rounded-full bg-[#F9F6C4] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-slate-600 shadow-sm">
                     Yakında
                   </span>
                 )}
               </div>
-              <h3 className="mt-4 font-[family-name:var(--font-clash-display)] text-base font-bold text-[#111827]">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#4b5563]">{item.description}</p>
+              <h3 className="mt-4 text-base font-bold text-slate-800">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
             </div>
           );
         })}

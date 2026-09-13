@@ -149,7 +149,7 @@ export default async function Mesajlar() {
               )}
             </div>
             {c.unread > 0 && (
-              <span className="shrink-0 rounded-full bg-coral px-2 py-0.5 text-[10px] font-bold text-white shadow-[0_2px_6px_rgba(239,68,104,0.5)]">
+              <span className="shrink-0 rounded-full bg-coral px-2 py-0.5 text-[10px] font-bold text-white shadow-[0_2px_6px_rgba(68,172,255,0.5)]">
                 {c.unread}
               </span>
             )}

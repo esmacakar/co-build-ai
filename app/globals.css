@@ -1,54 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eff6ff;
-  --foreground: #111827;
-  --font-clash-display: "Clash Display", sans-serif;
-  --font-satoshi: "Satoshi", sans-serif;
+  --background: #fafafc;
+  --foreground: #0f172a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-coral: #ef4468;
-  --color-coral-dark: #d1274a;
-  --color-periwinkle: #8b5cf6;
-  --color-periwinkle-dark: #6d28d9;
-  --color-petal: #fdf2f8;
-  --color-ink: #111827;
-  --color-ink-soft: #4b5563;
-  --color-sidebar: #bfdbfe;
+  --color-coral: #44acff;
+  --color-coral-dark: #2f8bd8;
+  --color-periwinkle: #fe9ec7;
+  --color-periwinkle-dark: #c23570;
+  --color-petal: #eaf6ff;
+  --color-ink: #0f172a;
+  --color-ink-soft: #64748b;
+  --color-sidebar: #ffffff;
 
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-inter);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-jakarta);
   --font-mono: var(--font-jetbrains);
 }
 
 body {
   background: var(--background);
+  background-image:
+    radial-gradient(50% 40% at 90% -5%, rgba(137, 212, 255, 0.16) 0%, transparent 70%),
+    radial-gradient(45% 35% at 8% 105%, rgba(254, 158, 199, 0.14) 0%, transparent 70%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* ---- Landing sayfası: kaydırdıkça akan fotoğraf arka plan (döşemesiz, dikişsiz) ---- */
+/* ---- Landing sayfası: yumuşak, ferah pastel gradyan arka plan ---- */
 .landing-bg {
   position: fixed;
   inset: 0;
   z-index: -10;
   overflow: hidden;
-  background: #000;
+  background: #f9f6c4;
+  background-image:
+    radial-gradient(60% 50% at 12% 8%, rgba(254, 158, 199, 0.55) 0%, transparent 70%),
+    radial-gradient(55% 45% at 90% 15%, rgba(137, 212, 255, 0.5) 0%, transparent 70%),
+    radial-gradient(65% 55% at 50% 100%, rgba(68, 172, 255, 0.25) 0%, transparent 70%);
 }
 .landing-bg .bg-layer {
   position: absolute;
   inset: -6%;
-  background-image: url("/landing-bg.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
-}
-.landing-bg .bg-layer--multiply {
-  mix-blend-mode: multiply;
-  opacity: 0.9;
 }
 
 /* ---- Daktilo (typing) animasyonu ---- */
@@ -74,52 +72,7 @@ body {
   }
 }
 
-/* ---- 3D panel gölgeleme (siyah çizgi yerine) ---- */
-.panel-3d {
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.35) inset,
-    0 18px 40px -12px rgba(0, 0, 0, 0.7),
-    0 6px 14px -6px rgba(255, 255, 255, 0.06);
-  transition:
-    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-style: preserve-3d;
-}
-.panel-3d:hover {
-  transform: translateY(-6px) rotateX(2deg);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 30px 60px -14px rgba(0, 0, 0, 0.8),
-    0 12px 22px -8px rgba(255, 255, 255, 0.1);
-}
-.badge-soft {
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
-}
-
-/* ---- Renkli container'lar: siyah çizgi + içe oyulmuş (groove) görünüm ---- */
-.panel-outline {
-  position: relative;
-  border: 2px solid #000;
-}
-.panel-outline::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow:
-    inset 0 4px 8px rgba(0, 0, 0, 0.4),
-    inset 0 -2px 4px rgba(255, 255, 255, 0.2),
-    inset 3px 0 6px rgba(0, 0, 0, 0.18),
-    inset -3px 0 6px rgba(0, 0, 0, 0.18);
-}
-.icon-3d {
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 8px 18px rgba(15, 23, 42, 0.28);
-}
-
-/* ---- Siyah highlighter geçişi: metin beyaz, arkasından siyah şerit süpürüyor ---- */
+/* ---- Yumuşak highlighter geçişi: metin koyu, arkasından pastel şerit süpürüyor ---- */
 .highlight-sweep {
   position: relative;
   z-index: 0;
@@ -133,7 +86,7 @@ body {
   bottom: -0.06em;
   left: -0.12em;
   width: 0;
-  background: var(--sweep-color, #000);
+  background: var(--sweep-color, #fe9ec7);
   border-radius: 0.18em;
   z-index: -1;
 }

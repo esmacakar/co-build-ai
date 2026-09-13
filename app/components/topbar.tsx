@@ -33,7 +33,7 @@ export default function Topbar({
   const title = PAGE_TITLES[pathname] ?? "Co-Build AI";
 
   return (
-    <header className="flex items-center justify-between border-b border-ink/10 px-6 py-4 sm:px-10">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/60 bg-white/70 px-6 py-4 backdrop-blur-xl sm:px-10">
       <h1 className="text-2xl font-extrabold tracking-tight text-ink">{title}</h1>
 
       <div className="flex items-center gap-4">

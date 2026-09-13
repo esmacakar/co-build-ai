@@ -3,7 +3,8 @@ import { Lightbulb, FileText, Users2, Compass, Send, Code2, Repeat, Layers, Spar
 const STORIES = [
   {
     id: "founder",
-    color: "#f70d19",
+    color: "#FE9EC7",
+    textColor: "#c23570",
 
     title: "Fikrin, bir gecede teknik şartnameye dönüşür",
     description:
@@ -17,7 +18,8 @@ const STORIES = [
   },
   {
     id: "developer",
-    color: "#0008fa",
+    color: "#89D4FF",
+    textColor: "#0f6ab0",
 
     title: "Projeleri keşfet, doğru olanı seç, inşa et",
     description:
@@ -31,7 +33,8 @@ const STORIES = [
   },
   {
     id: "dual",
-    color: "#6000fa",
+    color: "#44ACFF",
+    textColor: "#1666a8",
 
     title: "Hem fikir üret hem koda dök, tek hesapla",
     description:
@@ -64,12 +67,12 @@ export default function StorySection() {
                 } flex-1`}
               >
                 <span
-                  className="w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest text-black"
-                  style={{ background: story.color }}
+                  className="w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest"
+                  style={{ background: `${story.color}40`, color: story.textColor }}
                 >
-
+                  {story.id === "founder" ? "Fikir Sahibi" : story.id === "developer" ? "Yazılımcı" : "Dual Hesap"}
                 </span>
-                <h3 className="mt-4 font-[family-name:var(--font-clash-display)] text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                <h3 className="mt-4 font-[family-name:var(--font-playfair)] text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">
                   <span
                     className="highlight-sweep"
                     style={{ ["--sweep-color" as string]: story.color }}
@@ -77,7 +80,7 @@ export default function StorySection() {
                     {story.title}
                   </span>
                 </h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/80 sm:text-base">
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">
                   {story.description}
                 </p>
               </div>
@@ -88,16 +91,16 @@ export default function StorySection() {
                   return (
                     <div
                       key={step.text}
-                      className="story-reveal story-reveal--up story-reveal--step panel-3d flex items-center gap-4 rounded-2xl bg-white/95 px-5 py-4"
+                      className="story-reveal story-reveal--up story-reveal--step flex items-center gap-4 rounded-2xl bg-white/80 px-5 py-4 shadow-sm"
                       style={{ ["--story-delay" as string]: `${i * 0.15}s` }}
                     >
                       <span
-                        className="icon-3d flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-sm"
                         style={{ background: story.color }}
                       >
                         <Icon size={18} />
                       </span>
-                      <span className="font-[family-name:var(--font-clash-display)] text-base font-bold text-[#111827]">
+                      <span className="text-base font-bold text-slate-800">
                         {step.text}
                       </span>
                     </div>

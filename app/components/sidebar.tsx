@@ -92,7 +92,7 @@ export default function Sidebar({
   const groupLabelClass = collapsed ? "hidden" : "hidden px-3 md:block";
 
   return (
-    <aside className={`flex shrink-0 flex-col overflow-y-auto border-r border-ink/10 bg-sidebar py-6 ${collapsed ? "w-16" : "w-16 md:w-64"}`}>
+    <aside className={`flex shrink-0 flex-col overflow-y-auto border-r border-white/60 bg-white/70 py-6 shadow-sm backdrop-blur-xl ${collapsed ? "w-16" : "w-16 md:w-64"}`}>
       <div className="mb-6 flex items-center justify-between px-3 md:px-5">
         <Link href="/panel" className={blockClass}>
           <span className="text-lg font-bold text-ink">Co-Build AI</span>
@@ -127,7 +127,7 @@ export default function Sidebar({
                 title={item.label}
                 className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
                   active
-                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(68,172,255,0.35)]"
                     : "text-ink hover:bg-ink/5"
                 }`}
               >
@@ -143,7 +143,7 @@ export default function Sidebar({
               title="Yıldızlılarım"
               className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
                 pathname === "/yildizlarim"
-                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(68,172,255,0.35)]"
                   : "text-ink hover:bg-ink/5"
               }`}
             >
@@ -190,7 +190,7 @@ export default function Sidebar({
             <div
               className={`flex items-center rounded-full transition-colors md:justify-start ${
                 pathname.startsWith("/projelerim")
-                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(68,172,255,0.35)]"
                   : "text-ink hover:bg-ink/5"
               }`}
             >
@@ -251,7 +251,7 @@ export default function Sidebar({
                 title={item.label}
                 className={`flex items-center justify-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-semibold transition-colors md:justify-start ${
                   active
-                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                    ? "bg-coral text-white shadow-[0_6px_16px_rgba(68,172,255,0.35)]"
                     : "text-ink hover:bg-ink/5"
                 }`}
               >
@@ -265,7 +265,7 @@ export default function Sidebar({
             <div
               className={`flex items-center rounded-full transition-colors md:justify-start ${
                 pathname.startsWith("/ayarlar")
-                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(239,68,104,0.35)]"
+                  ? "bg-coral text-white shadow-[0_6px_16px_rgba(68,172,255,0.35)]"
                   : "text-ink hover:bg-ink/5"
               }`}
             >

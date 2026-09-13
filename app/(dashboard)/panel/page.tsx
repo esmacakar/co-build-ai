@@ -189,7 +189,7 @@ export default async function Panel() {
   return (
     <div>
       {profileIncomplete && (
-        <div className="mb-8 flex items-center gap-3 rounded-lg border border-periwinkle-dark/30 bg-periwinkle/10 px-4 py-3 text-sm text-ink">
+        <div className="mb-8 flex items-center gap-3 rounded-2xl border border-white/60 bg-gradient-to-r from-[#FE9EC7]/15 via-white/40 to-[#89D4FF]/15 px-5 py-4 text-sm text-ink shadow-sm backdrop-blur-sm">
           <span className="text-lg">✨</span>
           <span className="flex-1">
             Profilini tamamla — biyografi, beceri ve CV eklemek, eşleştirme motorunun seni doğru projelerle
@@ -204,7 +204,7 @@ export default async function Panel() {
       {processingProjects.length > 0 && (
         <div className="mb-8 flex flex-col gap-2">
           {processingProjects.map((p) => (
-            <a key={p.id} href={`/proje/${p.id}`} className="flex items-center gap-3 rounded-lg border border-coral/30 bg-petal/30 px-4 py-3 text-sm text-ink transition-colors hover:bg-petal/50">
+            <a key={p.id} href={`/proje/${p.id}`} className="flex items-center gap-3 rounded-2xl border border-white/60 bg-gradient-to-r from-[#89D4FF]/15 via-white/40 to-[#FE9EC7]/15 px-5 py-4 text-sm text-ink shadow-sm backdrop-blur-sm transition-colors hover:from-[#89D4FF]/25 hover:to-[#FE9EC7]/25">
               <span className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-coral border-t-transparent" />
               <span className="flex-1">
                 <strong>{p.title}</strong> için PRD hazırlanıyor, görmek için tıkla →
