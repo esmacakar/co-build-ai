@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Send, Check } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import Avatar from "@/app/components/avatar";
 import ProgressRing from "@/app/components/progress-ring";
@@ -17,11 +17,17 @@ export type MatchedDeveloper = {
 export default function MatchedDevelopers({
   developers,
   founderId,
+  projectId,
+  projectTitle,
   starredIds = [],
+  invitedIds = [],
 }: {
   developers: MatchedDeveloper[];
   founderId: string;
+  projectId: string;
+  projectTitle: string;
   starredIds?: string[];
+  invitedIds?: string[];
 }) {
   if (!developers || developers.length === 0) {
     return null;
@@ -44,7 +50,10 @@ export default function MatchedDevelopers({
             key={dev.developerId}
             developer={dev}
             founderId={founderId}
+            projectId={projectId}
+            projectTitle={projectTitle}
             initiallyStarred={starredIds.includes(dev.developerId)}
+            initiallyInvited={invitedIds.includes(dev.developerId)}
           />
         ))}
       </div>
@@ -59,15 +68,23 @@ export default function MatchedDevelopers({
 function MatchedDeveloperCard({
   developer,
   founderId,
+  projectId,
+  projectTitle,
   initiallyStarred,
+  initiallyInvited,
 }: {
   developer: MatchedDeveloper;
   founderId: string;
+  projectId: string;
+  projectTitle: string;
   initiallyStarred: boolean;
+  initiallyInvited: boolean;
 }) {
   const supabase = createClient();
   const [starred, setStarred] = useState(initiallyStarred);
   const [saving, setSaving] = useState(false);
+  const [invited, setInvited] = useState(initiallyInvited);
+  const [inviting, setInviting] = useState(false);
 
   async function toggleStar() {
     if (saving) return;
@@ -87,6 +104,21 @@ function MatchedDeveloperCard({
 
     setStarred((s) => !s);
     setSaving(false);
+  }
+
+  async function handleInvite() {
+    if (inviting || invited) return;
+    setInviting(true);
+
+    await supabase.from("notifications").insert({
+      user_id: developer.developerId,
+      project_id: projectId,
+      type: "project_invite",
+      message: `"${projectTitle}" projesi için seninle çalışmak istiyorlar — PRD'yi incele ve dilersen teklifini gönder.`,
+    });
+
+    setInvited(true);
+    setInviting(false);
   }
 
   return (
@@ -129,6 +161,26 @@ function MatchedDeveloperCard({
           ))}
         </div>
       )}
+
+      <button
+        onClick={handleInvite}
+        disabled={inviting || invited}
+        className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all disabled:opacity-70 ${
+          invited
+            ? "bg-periwinkle/20 text-periwinkle-dark"
+            : "bg-coral text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_0_var(--color-coral-dark)] hover:brightness-105 active:translate-y-0.5 active:shadow-none"
+        }`}
+      >
+        {invited ? (
+          <>
+            <Check size={14} /> Davet Gönderildi
+          </>
+        ) : (
+          <>
+            <Send size={14} /> {inviting ? "Gönderiliyor..." : "Projeye Davet Et"}
+          </>
+        )}
+      </button>
     </div>
   );
 }

@@ -149,7 +149,9 @@ export default async function Profil() {
             <p className="text-sm text-ink-soft">
               {activeRole === "founder" ? "Fikir Sahibi" : "Yazılımcı"}
             </p>
-            {activeRole === "developer" && <PatentBadge hasPatent={profile?.has_verified_patent} />}
+            {activeRole === "developer" && (
+              <PatentBadge hasPatent={profile?.has_verified_patent} patentUrl={profile?.patent_url} />
+            )}
           </div>
 
           <div className="mt-6 flex items-center gap-4">
@@ -227,6 +229,7 @@ export default async function Profil() {
             initialBio={profile?.bio ?? null}
             initialSkills={profile?.skills ?? null}
             initialCvUrl={profile?.cv_url ?? null}
+            initialPatentUrl={profile?.patent_url ?? null}
           />
         )}
 

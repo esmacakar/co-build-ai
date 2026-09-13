@@ -241,7 +241,9 @@ export default async function KullaniciProfili({
                 {viewedProfile.full_name ?? "İsimsiz Kullanıcı"}
               </h1>
               {isDeveloper && <AvailabilityBadge availability={viewedProfile.availability} />}
-              {isDeveloper && <PatentBadge hasPatent={viewedProfile.has_verified_patent} />}
+              {isDeveloper && (
+                <PatentBadge hasPatent={viewedProfile.has_verified_patent} patentUrl={viewedProfile.patent_url} />
+              )}
             </div>
             <p className="mt-1 text-sm text-ink-soft">{roleLabel}</p>
             <div className="mt-1.5 flex justify-center sm:justify-start">

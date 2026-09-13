@@ -195,18 +195,27 @@ export default async function ProjeDetay({
   // (bkz. prd-status.tsx). Boşsa MatchedDevelopers zaten hiçbir şey render etmiyor.
   const matchedDevelopers = (project.matched_developers ?? []) as MatchedDeveloper[];
 
-  // Bu 5 yazılımcıdan founder'ın daha önce yıldızladıklarını işaretleyebilmek için
+  // Bu 5 yazılımcıdan founder'ın daha önce yıldızladıklarını/davet ettiklerini
+  // işaretleyebilmek için
   let matchedStarredIds: string[] = [];
+  let matchedInvitedIds: string[] = [];
   if (isFounder && matchedDevelopers.length > 0) {
+    const matchedIds = matchedDevelopers.map((d) => d.developerId);
+
     const { data: starredData } = await supabase
       .from("starred_developers")
       .select("developer_id")
       .eq("founder_id", user.id)
-      .in(
-        "developer_id",
-        matchedDevelopers.map((d) => d.developerId)
-      );
+      .in("developer_id", matchedIds);
     matchedStarredIds = (starredData ?? []).map((s) => s.developer_id);
+
+    const { data: invitedData } = await supabase
+      .from("notifications")
+      .select("user_id")
+      .eq("project_id", project.id)
+      .eq("type", "project_invite")
+      .in("user_id", matchedIds);
+    matchedInvitedIds = (invitedData ?? []).map((n) => n.user_id);
   }
 
   // PRD + eşleşen yazılımcılar iki sütun halinde gösterileceği için (sadece
@@ -277,7 +286,10 @@ export default async function ProjeDetay({
                   <MatchedDevelopers
                     developers={matchedDevelopers}
                     founderId={user.id}
+                    projectId={project.id}
+                    projectTitle={project.title}
                     starredIds={matchedStarredIds}
+                    invitedIds={matchedInvitedIds}
                   />
                 </div>
 

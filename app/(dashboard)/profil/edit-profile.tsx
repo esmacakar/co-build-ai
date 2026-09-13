@@ -10,16 +10,19 @@ export default function EditProfile({
   initialBio,
   initialSkills,
   initialCvUrl,
+  initialPatentUrl,
 }: {
   userId: string;
   fullName: string | null;
   initialBio: string | null;
   initialSkills: string[] | null;
   initialCvUrl: string | null;
+  initialPatentUrl?: string | null;
 }) {
   const router = useRouter();
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const patentFileInputRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState(initialBio ?? "");
   const [skillsText, setSkillsText] = useState((initialSkills ?? []).join(", "));
@@ -27,6 +30,10 @@ export default function EditProfile({
   const [cvFileName, setCvFileName] = useState<string | null>(null);
   const [uploadingCv, setUploadingCv] = useState(false);
   const [cvError, setCvError] = useState<string | null>(null);
+  const [patentUrl, setPatentUrl] = useState(initialPatentUrl ?? "");
+  const [patentFileName, setPatentFileName] = useState<string | null>(null);
+  const [uploadingPatent, setUploadingPatent] = useState(false);
+  const [patentError, setPatentError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   async function handleCvFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -54,6 +61,31 @@ export default function EditProfile({
     setUploadingCv(false);
   }
 
+  async function handlePatentFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPatent(true);
+    setPatentError(null);
+
+    const ext = file.name.split(".").pop() ?? "pdf";
+    const path = `${userId}/patent.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("patent-belgeleri")
+      .upload(path, file, { upsert: true, cacheControl: "3600" });
+
+    if (uploadError) {
+      setPatentError("Patent belgesi yüklenemedi, tekrar dener misin?");
+      setUploadingPatent(false);
+      return;
+    }
+
+    const { data } = supabase.storage.from("patent-belgeleri").getPublicUrl(path);
+    setPatentUrl(`${data.publicUrl}?t=${Date.now()}`);
+    setPatentFileName(file.name);
+    setUploadingPatent(false);
+  }
+
   async function handleSave() {
     setSaving(true);
     const skillsArray = skillsText
@@ -63,7 +95,13 @@ export default function EditProfile({
 
     await supabase
       .from("profiles")
-      .update({ bio, skills: skillsArray, cv_url: cvUrl.trim() || null })
+      .update({
+        bio,
+        skills: skillsArray,
+        cv_url: cvUrl.trim() || null,
+        patent_url: patentUrl.trim() || null,
+        has_verified_patent: !!patentUrl.trim(),
+      })
       .eq("id", userId);
 
     // Eşleştirme motorunun anlamsal aramada bulabilmesi için profili
@@ -135,6 +173,21 @@ export default function EditProfile({
             <p className="text-xs text-ink-soft">Henüz CV yüklenmedi.</p>
           )}
         </div>
+
+        <div className="mt-2">
+          {initialPatentUrl ? (
+            <a
+              href={initialPatentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-coral-dark hover:underline"
+            >
+              Patent Belgesini Görüntüle →
+            </a>
+          ) : (
+            <p className="text-xs text-ink-soft">Henüz patent belgesi yüklenmedi.</p>
+          )}
+        </div>
       </div>
     );
   }
@@ -203,6 +256,56 @@ export default function EditProfile({
             )}
           </div>
           {cvError && <p className="mt-1 text-xs text-coral-dark">{cvError}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-ink">Patent Belgesi Yükle</label>
+          <p className="mt-0.5 text-xs text-ink-soft">
+            Tescilli bir patentin varsa belgeni yükle ya da patent sicil linkini yapıştır — kaydettiğinde
+            profilinde &quot;Tescilli Mucit&quot; rozeti otomatik görünür.
+          </p>
+          <div className="mt-1 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => patentFileInputRef.current?.click()}
+              disabled={uploadingPatent}
+              className="rounded-full bg-ink/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-2px_0_rgba(17,24,39,0.06)] active:shadow-[inset_0_2px_4px_rgba(17,24,39,0.10)] active:translate-y-px px-5 py-2 text-sm font-semibold text-ink-soft hover:bg-ink/10 hover:text-ink disabled:opacity-50"
+            >
+              {uploadingPatent ? "Yükleniyor..." : "Dosya Seç"}
+            </button>
+            <input
+              ref={patentFileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handlePatentFileChange}
+              className="hidden"
+            />
+            {patentFileName ? (
+              <span className="truncate text-xs text-ink-soft">{patentFileName}</span>
+            ) : patentUrl ? (
+              <a
+                href={patentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate text-xs font-semibold text-coral-dark hover:underline"
+              >
+                Mevcut belgeyi görüntüle →
+              </a>
+            ) : (
+              <span className="text-xs text-ink-soft">PDF, JPG veya PNG</span>
+            )}
+          </div>
+          <input
+            type="text"
+            value={patentFileName ? "" : patentUrl}
+            onChange={(e) => {
+              setPatentUrl(e.target.value);
+              setPatentFileName(null);
+            }}
+            placeholder="ya da patent sicil linki yapıştır (örn. TÜRKPATENT sayfası)"
+            className="mt-2 w-full rounded-lg bg-ink/5 shadow-[inset_0_2px_5px_rgba(17,24,39,0.08)] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-coral/30"
+          />
+          {patentError && <p className="mt-1 text-xs text-coral-dark">{patentError}</p>}
         </div>
 
         <div className="flex gap-3">
