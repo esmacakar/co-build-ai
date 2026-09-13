@@ -30,7 +30,7 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* ---- Landing sayfası: ekrana esneyerek dolan, animasyonlu fotoğraf arka plan ---- */
+/* ---- Landing sayfası: kaydırdıkça akan fotoğraf arka plan (döşemesiz, dikişsiz) ---- */
 .landing-bg {
   position: fixed;
   inset: 0;
@@ -38,27 +38,17 @@ body {
   overflow: hidden;
   background: #000;
 }
-.landing-bg::before {
-  content: "";
+.landing-bg .bg-layer {
   position: absolute;
   inset: -6%;
   background-image: url("/landing-bg.jpg");
-  background-size: 100% 100%;
   background-repeat: no-repeat;
-  background-position: center;
-  animation: landing-bg-breathe 20s ease-in-out infinite alternate;
+  background-size: cover;
+  background-position: center center;
 }
-
-@keyframes landing-bg-breathe {
-  0% {
-    transform: scale(1) translate(0, 0);
-  }
-  50% {
-    transform: scale(1.09) translate(-1.5%, 1.5%);
-  }
-  100% {
-    transform: scale(1.03) translate(1.5%, -1%);
-  }
+.landing-bg .bg-layer--multiply {
+  mix-blend-mode: multiply;
+  opacity: 0.9;
 }
 
 /* ---- Daktilo (typing) animasyonu ---- */
@@ -143,13 +133,18 @@ body {
   bottom: -0.06em;
   left: -0.12em;
   width: 0;
-  background: #000;
+  background: var(--sweep-color, #000);
   border-radius: 0.18em;
   z-index: -1;
 }
-.reveal.is-visible .highlight-sweep::before {
+.reveal.is-visible .highlight-sweep::before,
+.story-reveal.is-visible .highlight-sweep::before {
   animation: highlight-sweep 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards;
   animation-delay: 0.2s;
+}
+.story-reveal:not(.is-visible) .highlight-sweep::before {
+  animation: none;
+  width: 0;
 }
 @keyframes highlight-sweep {
   0% {
@@ -171,9 +166,33 @@ body {
   transform: translateY(0);
 }
 
+/* ---- Storyteller: her seferinde tekrar oynayan (loop-safe) animasyonlar ---- */
+.story-reveal {
+  opacity: 0;
+  transform: translateX(-56px) scale(0.96);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.story-reveal--right {
+  transform: translateX(56px) scale(0.96);
+}
+.story-reveal--up {
+  transform: translateY(36px) scale(0.96);
+}
+.story-reveal.is-visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+.story-reveal--step {
+  transition-delay: var(--story-delay, 0s);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .landing-bg::before {
-    animation: none;
+  .story-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
   .highlight-sweep::before {
     animation: none;

@@ -4,7 +4,7 @@ export default function DualEntrySection({ idSuffix = "" }: { idSuffix?: string 
   return (
     <section id={`basla${idSuffix}`} className="px-6 pb-20 sm:px-12">
       <div className="reveal mx-auto max-w-3xl text-center">
-        <span className="badge-soft w-fit rounded-full bg-white px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-widest text-[#063ecc]">
+        <span className="w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white">
           Sana uygun kapıyı seç
         </span>
         <h2 className="mt-4 font-[family-name:var(--font-clash-display)] text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -36,7 +36,7 @@ export default function DualEntrySection({ idSuffix = "" }: { idSuffix?: string 
         </div>
 
         {/* Yazılımcı kartı — terminal hissiyatı */}
-        <div className="reveal panel-3d panel-outline flex flex-col rounded-3xl bg-[#1423f7] p-8 font-mono">
+        <div className="reveal panel-3d panel-outline flex flex-col rounded-3xl bg-[#0008fa] p-8 font-mono">
           <span className="flex w-fit items-center gap-1.5 rounded-full bg-black/15 px-3 py-1 text-xs font-semibold text-black">
             <Terminal size={12} />
             developer
@@ -60,17 +60,17 @@ export default function DualEntrySection({ idSuffix = "" }: { idSuffix?: string 
         </div>
 
         {/* Dual hesap kartı */}
-        <div className="reveal panel-3d panel-outline flex flex-col rounded-3xl bg-[#5414f7] p-8">
+        <div className="reveal panel-3d panel-outline flex flex-col rounded-3xl bg-[#6000fa] p-8">
           <span className="flex w-fit items-center gap-1.5 rounded-full bg-black/15 px-3 py-1 text-xs font-semibold text-black">
             <Shuffle size={12} />
             Hem fikir hem kod
           </span>
           <h3 className="mt-4 font-[family-name:var(--font-clash-display)] text-2xl font-bold tracking-tight text-black">
-            İkisini Birden Yap
+            Hem fikrin var hem kod yazabiliyor musun? 
           </h3>
           <p className="mt-3 flex-1 text-sm leading-relaxed text-black/80">
-            Hem fikrin var hem kod yazabiliyor musun? Tek hesapla hem fikrini geliştir hem
-            kendine ortak yazılımcı ara — dilediğin an Fikir Sahibi / Yazılımcı modu
+            Tek hesapla hem fikrini geliştir hem
+            kendine ortak yazılımcı ara, dilediğin an Fikir Sahibi / Yazılımcı modu
             arasında geçiş yaparsın.
           </p>
           <a

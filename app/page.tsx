@@ -1,5 +1,6 @@
 import HeroSection from "./components/landing/hero-section";
 import DualEntrySection from "./components/landing/dual-entry-section";
+import StorySection from "./components/landing/story-section";
 import HowItWorksSection from "./components/landing/how-it-works-section";
 import BenefitsSection from "./components/landing/benefits-section";
 import ArchitectureSection from "./components/landing/architecture-section";
@@ -11,13 +12,14 @@ function LoopBody({ idSuffix = "" }: { idSuffix?: string }) {
       <main className="flex flex-1 flex-col">
         <HeroSection />
         <DualEntrySection idSuffix={idSuffix} />
+        <StorySection />
         <HowItWorksSection />
       </main>
 
       <BenefitsSection />
       <ArchitectureSection idSuffix={idSuffix} />
 
-      <footer className="bg-white/10 px-6 py-10 shadow-[0_-16px_30px_-20px_rgba(15,23,42,0.35)] backdrop-blur-md sm:px-12">
+      <footer className="bg-gradient-to-t from-black/30 via-black/10 to-transparent px-6 py-10 sm:px-12">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="text-center sm:text-left">
             <span className="font-[family-name:var(--font-clash-display)] text-base font-bold text-white">
@@ -49,10 +51,13 @@ function LoopBody({ idSuffix = "" }: { idSuffix?: string }) {
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col font-[family-name:var(--font-satoshi)]">
-      <div className="landing-bg" />
+      <div className="landing-bg">
+        <div id="bg-layer-base" className="bg-layer" />
+        <div id="bg-layer-multiply" className="bg-layer bg-layer--multiply" />
+      </div>
       <ScrollEffects />
 
-      <header className="sticky top-0 z-40 flex items-center justify-between bg-white/10 px-6 py-5 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.4)] backdrop-blur-md sm:px-12">
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-gradient-to-b from-black/30 via-black/10 to-transparent px-6 py-5 sm:px-12">
         <span className="font-[family-name:var(--font-clash-display)] text-lg font-bold text-white">
           Co-Build AI
         </span>

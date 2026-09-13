@@ -3,9 +3,9 @@ import { Lock, Zap, Target, MessageCircle } from "lucide-react";
 const BENEFITS = [
   {
     icon: Lock,
-    title: "Verin Yurt Dışına Çıkmaz",
+    title: "Verilerin Güvende",
     description:
-      "PRD üretimi kendi GPU sunucumuzda, açık kaynak bir modelle çalışır — OpenAI/Gemini gibi dış API'lere hiçbir veri gönderilmez.",
+      "PRD üretimi kendi GPU sunucumuzda, açık kaynak bir modelle çalışır, dış API'lere bağımlı kalmaz.",
   },
   {
     icon: Zap,
@@ -17,7 +17,7 @@ const BENEFITS = [
     icon: Target,
     title: "Anlam Bazlı Eşleştirme",
     description:
-      "Anahtar kelime eşleşmesi değil, embedding tabanlı semantik arama — projenin gerçekten ihtiyaç duyduğu beceriler öne çıkar.",
+      "Anahtar kelime eşleşmesi değil, embedding tabanlı semantik arama ileprojenin gerçekten ihtiyaç duyduğu beceriler öne çıkar.",
   },
   {
     icon: MessageCircle,
@@ -31,7 +31,7 @@ export default function BenefitsSection() {
   return (
     <section className="px-6 py-20 sm:px-12">
       <div className="reveal mx-auto max-w-2xl text-center">
-        <span className="badge-soft w-fit rounded-full bg-white px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-widest text-[#5f06cc]">
+        <span className="w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white">
           Neden Co-Build AI?
         </span>
         <h2 className="mt-4 font-[family-name:var(--font-clash-display)] text-3xl font-bold tracking-tight text-white sm:text-4xl">

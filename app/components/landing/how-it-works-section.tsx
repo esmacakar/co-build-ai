@@ -28,7 +28,7 @@ export default function HowItWorksSection() {
   return (
     <section className="px-6 py-20 sm:px-12">
       <div className="reveal mx-auto max-w-2xl text-center">
-        <span className="badge-soft w-fit rounded-full bg-white px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-widest text-[#cc0621]">
+        <span className="w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white">
           Süreç
         </span>
         <h2 className="mt-4 font-[family-name:var(--font-clash-display)] text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -51,7 +51,7 @@ export default function HowItWorksSection() {
               <div className="icon-3d relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#cc0621]">
                 <Icon size={20} />
               </div>
-              <span className="mt-3 font-mono text-[11px] font-semibold uppercase tracking-widest text-white/70">
+              <span className="mt-3 font-[family-name:var(--font-clash-display)] text-[11px] font-semibold uppercase tracking-widest text-white/70">
                 Adım {i + 1}
               </span>
               <h3 className="mt-1.5 font-[family-name:var(--font-clash-display)] text-base font-bold text-white">{step.title}</h3>

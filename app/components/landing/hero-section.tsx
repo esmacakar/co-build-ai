@@ -6,7 +6,7 @@ export default function HeroSection() {
       <TypingText
         as="span"
         text="Fikrinden ürüne, AI ile"
-        className="reveal w-fit font-mono text-[11px] font-semibold uppercase tracking-widest text-white"
+        className="reveal w-fit font-[family-name:var(--font-clash-display)] text-sm font-semibold uppercase tracking-widest text-white"
         speed={42}
       />
 
